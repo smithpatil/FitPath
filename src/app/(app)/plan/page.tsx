@@ -1,0 +1,81 @@
+import Link from "next/link";
+import ExerciseCard from "@/components/ExerciseCard";
+import { WEEKDAYS } from "@/lib/dates";
+import { groupTitle } from "@/lib/labels";
+import { usableFor, weekdayForSlot } from "@/lib/planGenerator";
+import { getCurrentWeek } from "@/lib/planStore";
+import { getProfile } from "@/lib/profile";
+import { createClient } from "@/lib/supabase/server";
+import { EXERCISES } from "@/data/exercises";
+import { scheduleGroupsForDay } from "../groups";
+
+export const metadata = { title: "Your plan — FitPath" };
+
+export default async function PlanPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const profile = (await getProfile(supabase))!;
+  const week = await getCurrentWeek(supabase, user!.id, profile);
+  const daysUsed = week.days.length;
+  const usableCount = usableFor(profile).length;
+
+  return (
+    <div className="space-y-10">
+      <header>
+        <h1 className="text-3xl font-bold">Your weekly plan</h1>
+        <p className="mt-2 text-muted">
+          Week {week.weekIndex + 1} of your plan. Each week the numbers go up a little, so you keep improving.
+        </p>
+      </header>
+
+      <section aria-labelledby="words" className="rounded-2xl bg-accent-soft p-6">
+        <h2 id="words" className="text-xl font-semibold text-accent-dark">Quick word guide</h2>
+        <ul className="mt-2 space-y-1 text-base">
+          <li><strong>Rep</strong> (repetition): doing the movement once.</li>
+          <li><strong>Set</strong>: a group of reps. &quot;2 sets of 8&quot; means 8 reps, a short rest, then 8 more.</li>
+          <li><strong>Seconds</strong>: for some moves you hold a position instead of counting reps.</li>
+        </ul>
+        <p className="mt-3 text-base">Move slowly, breathe normally, and stop if anything hurts.</p>
+      </section>
+
+      {daysUsed === 0 ? (
+        <p className="text-muted">We could not build a plan from your answers. Try changing your equipment or limits in Settings.</p>
+      ) : (
+        week.days.map((d) => (
+          <section key={d.slot} aria-labelledby={`day-${d.slot}`}>
+            <h2 id={`day-${d.slot}`} className="text-2xl font-bold">
+              {WEEKDAYS[weekdayForSlot(daysUsed, d.slot)]}
+            </h2>
+            <p className="mt-1 text-muted">
+              {groupTitle(scheduleGroupsForDay(d.items))} · about {d.items.reduce((s, i) => s + i.exercise.durationMin, 0)} minutes
+              (your limit is {profile.minutes} minutes for each workout day)
+            </p>
+            {d.items.reduce((s, i) => s + i.exercise.durationMin, 0) < profile.minutes * 0.7 && (
+              <p className="mt-1 text-base text-muted">
+                This workout is shorter than your limit because your equipment and safety answers leave fewer moves to choose from.
+              </p>
+            )}
+            <ul className="mt-5 space-y-4">
+              {d.items.map((item) => (
+                <ExerciseCard key={item.id} item={item} />
+              ))}
+            </ul>
+          </section>
+        ))
+      )}
+
+      <section aria-labelledby="how" className="rounded-2xl border-2 border-gray-200 p-6">
+        <h2 id="how" className="text-xl font-semibold">How was this plan made?</h2>
+        <p className="mt-2 text-muted">
+          Out of {EXERCISES.length} exercises, {usableCount} suit your equipment and safety answers. Muscles that work together are placed on
+          different days so they can rest. Each day is filled with the most useful exercises that fit in your {profile.minutes} minutes.
+        </p>
+        <p className="mt-3">
+          <Link href="/maths" className="font-semibold text-accent underline">See the maths behind it</Link>
+        </p>
+      </section>
+    </div>
+  );
+}
