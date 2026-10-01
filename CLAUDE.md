@@ -44,5 +44,5 @@ No heavy animation, popups, or autoplay video. Plain language for beginners; exp
 
 ## Working style
 Build in small phases and stop after each for the user to test. Give exact run/test commands (Windows PowerShell).
-STATUS: phases 0-6 are DONE and tested. Phase 7 (polish: accessibility, mobile check, 404/error pages, re-enable Supabase "Confirm email", timezone handling, README) and Phase 8 (Vercel deploy: env vars, Supabase redirect URLs, smoke test) are ON HOLD until the user finishes some extra additions.
+STATUS: phases 0-8 are DONE. Live at https://fit-path-theta.vercel.app (Vercel, auto-deploys on push to `main` of GitHub smithpatil/FitPath). Env vars set in Vercel: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, GROQ_API_KEY (+ optional GROQ_MODEL). Supabase Auth Site URL / Redirect URLs must include the live address. "Confirm email" is OFF (Supabase built-in email only reaches team members). Database changes (schema/seed) must be run manually in Supabase; code changes go live with `git add -A; git commit; git push`.
 Phases: 0 scaffold · 1 maths lib + tests · 2 Supabase + auth · 3 onboarding · 4 plan generator + dashboard/plan pages · 5 progress + settings · 6 Maths page · 7 polish + deploy.

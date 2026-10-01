@@ -1,4 +1,8 @@
+import { addDays, parseISODate } from "@/lib/dates";
 import type { WeekCount } from "@/lib/progress";
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const short = (d: Date) => `${d.getDate()} ${MONTHS[d.getMonth()]}`;
 
 // Simple bar chart drawn with SVG: workout days per week.
 export default function BarChart({ data }: { data: WeekCount[] }) {
@@ -12,13 +16,16 @@ export default function BarChart({ data }: { data: WeekCount[] }) {
   const step = (W - left) / data.length;
   const barW = Math.min(28, step * 0.6);
   const ticks = Array.from({ length: max + 1 }, (_, i) => i);
+  // The last bar is the current week (Monday to Sunday).
+  const thisMonday = data.length ? parseISODate(data[data.length - 1].weekStart) : new Date();
+  const thisWeekRange = `${short(thisMonday)} to ${short(addDays(thisMonday, 6))}`;
 
   return (
     <figure>
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
-        aria-label={`Bar chart of workout days per week. ${data.map((d) => `Week of ${d.label}: ${d.count}`).join(". ")}.`}
+        aria-label={`Bar chart of workout days per week. ${data.map((d, i) => `${i === data.length - 1 ? "This week" : `Week of ${d.label}`}: ${d.count}`).join(". ")}.`}
         className="w-full"
       >
         {ticks.map((t) => {
@@ -33,6 +40,7 @@ export default function BarChart({ data }: { data: WeekCount[] }) {
           );
         })}
         {data.map((d, i) => {
+          const isThisWeek = i === data.length - 1;
           const h = (d.count / max) * plotH;
           const x = left + i * step + (step - barW) / 2;
           return (
@@ -43,17 +51,20 @@ export default function BarChart({ data }: { data: WeekCount[] }) {
                   {d.count}
                 </text>
               )}
-              <text x={x + barW / 2} y={H - 16} textAnchor="middle" fontSize="10" fill="#4b5563">
-                {d.label.split(" ")[0]}
+              <text x={x + barW / 2} y={H - 16} textAnchor="middle" fontSize="10" fontWeight={isThisWeek ? 700 : 400} fill={isThisWeek ? "#115e59" : "#4b5563"}>
+                {isThisWeek ? "This" : d.label.split(" ")[0]}
               </text>
-              <text x={x + barW / 2} y={H - 4} textAnchor="middle" fontSize="9" fill="#4b5563">
-                {d.label.split(" ")[1]}
+              <text x={x + barW / 2} y={H - 4} textAnchor="middle" fontSize="9" fontWeight={isThisWeek ? 700 : 400} fill={isThisWeek ? "#115e59" : "#4b5563"}>
+                {isThisWeek ? "week" : d.label.split(" ")[1]}
               </text>
             </g>
           );
         })}
       </svg>
-      <figcaption className="text-base text-muted">Workout days completed each week (week starting on the date shown).</figcaption>
+      <figcaption className="text-base text-muted">
+        Each bar is one week, Monday to Sunday, named after its Monday (for example &quot;28 Sep&quot;). The last bar is <strong>this week</strong>:{" "}
+        {thisWeekRange}.
+      </figcaption>
     </figure>
   );
 }
