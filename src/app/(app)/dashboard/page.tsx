@@ -72,7 +72,7 @@ export default async function DashboardPage() {
             )}
             <ul className="mt-6 space-y-4">
               {today.items.map((item) => (
-                <ExerciseCard key={item.id} item={item} />
+                <ExerciseCard key={item.id} item={item} units={profile.units} />
               ))}
             </ul>
             {today.items.length > 0 && today.items.every((i) => i.done) && (

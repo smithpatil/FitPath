@@ -73,7 +73,7 @@ export default async function PlanPage() {
             <RoutineBox title="Warm-up first" moves={warmup} />
             <ul className="mt-5 space-y-4">
               {d.items.map((item) => (
-                <ExerciseCard key={item.id} item={item} />
+                <ExerciseCard key={item.id} item={item} units={profile.units} />
               ))}
             </ul>
             <RoutineBox title="Then cool down" moves={cooldown} />

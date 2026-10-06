@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { markDone } from "@/app/(app)/actions";
+import { parseAmount, parseWeight } from "@/lib/strength";
 import { finishesExercise, formatClock, initialState, workoutReducer, type WorkoutAction, type WorkoutState } from "@/lib/workoutMode";
 
 export interface RoutineStep {
@@ -20,6 +21,12 @@ export interface WorkoutItem {
   unit: "reps" | "seconds" | "minutes";
   target: string;
   done: boolean;
+  /** Dumbbell / gym rep exercise, so a weight can be logged. */
+  weighted: boolean;
+  /** "Last time: 10 kg × 10 reps", if there is an earlier result. */
+  lastText: string;
+  /** Suggested weight for today (double progression), in the user's unit. */
+  suggestion: number | null;
 }
 
 // Step-by-step workout screen: one exercise at a time, a set counter, hold and rest timers.
@@ -30,6 +37,7 @@ export default function WorkoutMode({
   title,
   warmup,
   cooldown,
+  units,
 }: {
   items: WorkoutItem[];
   restSecs: number;
@@ -37,12 +45,17 @@ export default function WorkoutMode({
   title: string;
   warmup: RoutineStep[];
   cooldown: RoutineStep[];
+  units: "kg" | "lb";
 }) {
   const [state, setState] = useState<WorkoutState>(() => initialState(items.map((i) => i.done)));
   const [doneIds, setDoneIds] = useState(() => new Set(items.filter((i) => i.done).map((i) => i.id)));
   const [endsAt, setEndsAt] = useState<number | null>(null); // when the running timer reaches 0
   const [now, setNow] = useState(() => Date.now());
   const [saveError, setSaveError] = useState(false);
+  // What the user actually did, per exercise (pre-filled with the target and the suggested weight).
+  const [numbers, setNumbers] = useState<Record<string, { amount: string; weight: string }>>(() =>
+    Object.fromEntries(items.map((i) => [i.id, { amount: String(i.reps), weight: i.suggestion === null ? "" : String(i.suggestion) }])),
+  );
   // Show the warm-up first, unless the workout has already been started.
   const [warmedUp, setWarmedUp] = useState(() => items.some((i) => i.done));
 
@@ -60,7 +73,12 @@ export default function WorkoutMode({
     // Finishing the LAST set of an exercise ticks it done (saved straight away).
     if (finishesExercise(state, steps) && !doneIds.has(item.id)) {
       setDoneIds(new Set(doneIds).add(item.id));
-      markDone(item.id).catch(() => setSaveError(true));
+      const amount = parseAmount(numbers[item.id].amount);
+      const weight = item.weighted ? parseWeight(numbers[item.id].weight) : null;
+      markDone(item.id, {
+        amount: amount === "invalid" ? null : amount,
+        weight: weight === "invalid" ? null : weight,
+      }).catch(() => setSaveError(true));
     }
     const next = apply({ type: "finishSet" });
     setEndsAt(next.phase === "resting" ? Date.now() + restSecs * 1000 : null);
@@ -220,6 +238,54 @@ export default function WorkoutMode({
               <strong>How to do it: </strong>
               {item.howTo}
             </p>
+            {item.lastText && (
+              <p className="mt-2 text-base">
+                <span className="text-muted">Last time:</span> {item.lastText}
+                {item.suggestion !== null && (
+                  <>
+                    {" "}
+                    · <strong>try {item.suggestion} {units} today</strong>
+                  </>
+                )}
+              </p>
+            )}
+
+            {/* Optional: what you really did. Saved when the exercise's last set is finished. */}
+            {state.phase === "ready" && !doneIds.has(item.id) && (
+              <div className="mt-4 flex flex-wrap gap-4">
+                <div>
+                  <label htmlFor={`wm-amount-${item.id}`} className="block text-base">
+                    {item.unit === "reps" ? "Reps you did per set" : item.unit === "seconds" ? "Seconds you held" : "Minutes you did"}
+                  </label>
+                  <input
+                    id={`wm-amount-${item.id}`}
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    value={numbers[item.id].amount}
+                    onChange={(e) => setNumbers({ ...numbers, [item.id]: { ...numbers[item.id], amount: e.target.value } })}
+                    className="mt-1 w-28 rounded-xl border-2 border-gray-500 px-3 py-2"
+                  />
+                </div>
+                {item.weighted && (
+                  <div>
+                    <label htmlFor={`wm-weight-${item.id}`} className="block text-base">
+                      Weight ({units})
+                    </label>
+                    <input
+                      id={`wm-weight-${item.id}`}
+                      type="number"
+                      inputMode="decimal"
+                      step="0.5"
+                      min="0.5"
+                      value={numbers[item.id].weight}
+                      onChange={(e) => setNumbers({ ...numbers, [item.id]: { ...numbers[item.id], weight: e.target.value } })}
+                      className="mt-1 w-28 rounded-xl border-2 border-gray-500 px-3 py-2"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             {state.phase === "holding" ? (
               <div className="mt-8 text-center">

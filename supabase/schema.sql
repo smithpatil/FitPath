@@ -60,7 +60,10 @@ create table if not exists public.workout_logs (
   plan_item_id uuid references public.plan_items(id) on delete set null,
   exercise_id  text not null references public.exercises(id),
   completed_on date not null default current_date,
-  created_at   timestamptz not null default now()
+  created_at   timestamptz not null default now(),
+  -- Phase 12 (also in migrations/003_logged_results.sql): what was actually done
+  amount_done  int check (amount_done is null or amount_done between 1 and 1000),          -- reps per set / seconds / minutes
+  weight_kg    numeric(6,2) check (weight_kg is null or (weight_kg > 0 and weight_kg <= 500)) -- always stored in kg
 );
 
 create table if not exists public.body_weights (

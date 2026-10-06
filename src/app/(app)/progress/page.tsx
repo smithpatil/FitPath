@@ -1,7 +1,9 @@
 import BarChart from "@/components/BarChart";
 import LineChart from "@/components/LineChart";
 import { toISODate } from "@/lib/dates";
-import { getLogDates } from "@/lib/planStore";
+import { EXERCISES } from "@/data/exercises";
+import { getLogDates, getLoggedResults } from "@/lib/planStore";
+import { personalBests } from "@/lib/strength";
 import { getProfile } from "@/lib/profile";
 import { weeklyCounts } from "@/lib/progress";
 import { createClient } from "@/lib/supabase/server";
@@ -19,6 +21,7 @@ export default async function ProgressPage() {
   const logDates = await getLogDates(supabase);
   const now = await getToday();
   const weeks = weeklyCounts(logDates, now, 8);
+  const bests = personalBests(await getLoggedResults(supabase)).slice(0, 10);
   const total = weeks.reduce((s, w) => s + w.count, 0);
   const streak = weekStreak(logDates, now);
 
@@ -44,6 +47,31 @@ export default async function ProgressPage() {
         <div className="mt-4 max-w-xl">
           <BarChart data={weeks} />
         </div>
+      </section>
+
+      <section aria-labelledby="bests">
+        <h2 id="bests" className="text-2xl font-bold">
+          Your best lifts
+        </h2>
+        {bests.length === 0 ? (
+          <p className="mt-2 text-muted">
+            When you finish a dumbbell or gym exercise, write down the weight you used. Your heaviest one for each exercise will show here.
+          </p>
+        ) : (
+          <ul className="mt-4 max-w-xl divide-y divide-gray-200 rounded-2xl border-2 border-gray-200">
+            {bests.map((b) => (
+              <li key={b.exerciseId} className="flex flex-wrap items-center justify-between gap-2 px-5 py-3">
+                <span className="font-medium">{EXERCISES.find((e) => e.id === b.exerciseId)?.name ?? b.exerciseId}</span>
+                <span>
+                  <strong>
+                    {fromKg(b.weightKg, profile.units)} {profile.units}
+                  </strong>{" "}
+                  <span className="text-muted">on {b.date}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section aria-labelledby="weight">

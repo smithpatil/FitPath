@@ -4,6 +4,7 @@ import { EXERCISES } from "../data/exercises";
 import { mondayOf, toISODate, weeksBetween } from "./dates";
 import { multipliersFromFeedback, stepSum, type Feeling } from "./math/recurrence";
 import { generatePlan } from "./planGenerator";
+import type { LoggedResult } from "./strength";
 import { getToday } from "./today.server";
 import type { Profile } from "./profile";
 import type { Exercise } from "./math/types";
@@ -15,6 +16,10 @@ export interface WeekItem {
   sets: number;
   reps: number;
   done: boolean;
+  /** What was logged for THIS item (only once it is done). */
+  log?: { amount: number | null; weightKg: number | null };
+  /** The most recent earlier result for the same exercise, if any. */
+  last?: LoggedResult;
 }
 
 export interface WeekDay {
@@ -101,11 +106,26 @@ export async function getCurrentWeek(supabase: SupabaseClient, userId: string, p
   const { data: feedback } = await supabase.from("workout_feedback").select("day, feeling").eq("week_start", weekStart);
   const feelingOf = new Map((feedback ?? []).map((f) => [f.day as number, f.feeling as Feeling]));
 
+  // Logged results: this week's items get their own log; every item gets the latest earlier result.
+  const results = await getLoggedResults(supabase);
+  const ownLog = new Map(results.filter((l) => l.planItemId).map((l) => [l.planItemId!, l]));
+
   const byDay = new Map<number, WeekItem[]>();
   for (const r of rows ?? []) {
     const exercise = EXERCISES.find((e) => e.id === r.exercise_id);
     if (!exercise) continue;
-    const item: WeekItem = { id: r.id, day: r.day, exercise, sets: r.sets, reps: r.reps, done: r.done };
+    const own = ownLog.get(r.id);
+    const last = results.find((l) => l.exerciseId === r.exercise_id && l.planItemId !== r.id && (l.amount !== null || l.weightKg !== null));
+    const item: WeekItem = {
+      id: r.id,
+      day: r.day,
+      exercise,
+      sets: r.sets,
+      reps: r.reps,
+      done: r.done,
+      log: own ? { amount: own.amount, weightKg: own.weightKg } : undefined,
+      last,
+    };
     byDay.set(r.day, [...(byDay.get(r.day) ?? []), item]);
   }
   const days = [...byDay.entries()]
@@ -119,4 +139,30 @@ export async function getCurrentWeek(supabase: SupabaseClient, userId: string, p
 export async function getLogDates(supabase: SupabaseClient): Promise<string[]> {
   const { data } = await supabase.from("workout_logs").select("completed_on").order("completed_on", { ascending: false }).limit(500);
   return (data ?? []).map((r) => r.completed_on);
+}
+
+/**
+ * Recent logged results, newest first, with the target of the day they were logged on.
+ * If the Phase 12 database update has not been run yet, this quietly returns [].
+ */
+export async function getLoggedResults(supabase: SupabaseClient): Promise<(LoggedResult & { planItemId: string | null })[]> {
+  const { data, error } = await supabase
+    .from("workout_logs")
+    .select("plan_item_id, exercise_id, amount_done, weight_kg, completed_on, plan_items(reps)")
+    .order("completed_on", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(500);
+  if (error || !data) return [];
+  return data.map((r) => {
+    const planItem = r.plan_items as { reps: number } | { reps: number }[] | null;
+    const target = Array.isArray(planItem) ? (planItem[0]?.reps ?? null) : (planItem?.reps ?? null);
+    return {
+      planItemId: r.plan_item_id,
+      exerciseId: r.exercise_id,
+      amount: r.amount_done,
+      weightKg: r.weight_kg === null ? null : Number(r.weight_kg),
+      target,
+      date: r.completed_on,
+    };
+  });
 }

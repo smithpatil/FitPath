@@ -6,7 +6,10 @@ import TruthTable from "@/components/maths/TruthTable";
 import { EQUIPMENT_LABEL, GROUP_LABEL } from "@/lib/labels";
 import { SAFETY_RULES } from "@/lib/math/logic";
 import { buildMathsExamples } from "@/lib/mathsExamples";
-import { getCurrentWeek } from "@/lib/planStore";
+import { EXERCISES } from "@/data/exercises";
+import { getCurrentWeek, getLoggedResults } from "@/lib/planStore";
+import { WEIGHT_STEP, suggestNextWeight } from "@/lib/strength";
+import { fromKg } from "@/lib/units";
 import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 
@@ -34,6 +37,9 @@ export default async function MathsPage() {
   } = await supabase.auth.getUser();
   const profile = (await getProfile(supabase))!;
   const week = await getCurrentWeek(supabase, user!.id, profile);
+  // Latest result with a weight and a target, for the double-progression example.
+  const lastLift = (await getLoggedResults(supabase)).find((r) => r.weightKg !== null && r.target !== null);
+  const liftName = lastLift ? EXERCISES.find((e) => e.id === lastLift.exerciseId)?.name : undefined;
   const ex = buildMathsExamples(
     profile,
     week.days.map((d) => ({ exerciseIds: d.items.map((i) => i.exercise.id) })),
@@ -498,6 +504,42 @@ export default async function MathsPage() {
             As a double-check the program compared both methods for weeks 0 to {recurrence.proof.checkedUpTo}: they agree{" "}
             {recurrence.proof.allAgree ? "every time ✓" : "✗"}.
           </p>
+        </div>
+
+        {/* Double progression: a piecewise recurrence on the weight lifted */}
+        <div className="rounded-xl bg-white p-4">
+          <p className="text-lg font-semibold">Weights: a piecewise recurrence (&quot;double progression&quot;)</p>
+          <p className="mt-2">
+            For dumbbell and gym exercises you can write down the weight you used. The suggested weight for next time follows a rule with
+            two cases:
+          </p>
+          <Formula>
+            W(n + 1) = W(n) + Δ   if you managed all the target reps<br />
+            W(n + 1) = W(n)       otherwise   (Δ = {WEIGHT_STEP[profile.units]} {profile.units})
+          </Formula>
+          <p className="text-base text-muted">
+            So the reps rise first (the plan&apos;s own recurrence), and the weight only goes up once you can do them all. The weight never goes
+            down.
+          </p>
+          {lastLift && liftName ? (
+            <p className="mt-3">
+              Your latest: <strong>{liftName}</strong> at W(n) = {fromKg(lastLift.weightKg!, profile.units)} {profile.units}, with{" "}
+              {lastLift.amount ?? "?"} reps done out of a target of {lastLift.target}.{" "}
+              {lastLift.amount !== null && lastLift.amount >= lastLift.target!
+                ? "All reps done, so the first case applies:"
+                : "Not all reps yet, so the second case applies:"}{" "}
+              W(n + 1) ={" "}
+              <strong>
+                {suggestNextWeight(fromKg(lastLift.weightKg!, profile.units), lastLift.amount, lastLift.target, WEIGHT_STEP[profile.units])}{" "}
+                {profile.units}
+              </strong>
+              .
+            </p>
+          ) : (
+            <p className="mt-3">
+              You have not logged a weight yet. Finish a dumbbell or gym exercise and enter the weight, and your own example will appear here.
+            </p>
+          )}
         </div>
 
         {/* Adaptive overload: the step changes with the user's feedback */}

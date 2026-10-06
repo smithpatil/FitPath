@@ -7,6 +7,8 @@ import { chooseSwap, exerciseMinutes, targetFor, usableFor } from "@/lib/planGen
 import { getOverload } from "@/lib/planStore";
 import { getToday } from "@/lib/today.server";
 import { getProfile } from "@/lib/profile";
+import { parseAmount, parseWeight } from "@/lib/strength";
+import { toKg } from "@/lib/units";
 import { createClient } from "@/lib/supabase/server";
 
 function refresh() {
@@ -15,11 +17,17 @@ function refresh() {
   revalidatePath("/progress");
 }
 
+/** What the user says they actually did. Weight is in THEIR unit (kg or lb). */
+export interface ResultInput {
+  amount?: number | null;
+  weight?: number | null;
+}
+
 /**
  * Set one plan item to done / not done and keep the workout log in step.
  * `wanted` = true/false sets it; undefined flips it.
  */
-async function setItemDone(itemId: string, wanted?: boolean) {
+async function setItemDone(itemId: string, wanted?: boolean, result?: ResultInput) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -40,10 +48,27 @@ async function setItemDone(itemId: string, wanted?: boolean) {
       exercise_id: item.exercise_id,
       completed_on: toISODate(await getToday()),
     });
+    // The result is saved separately, so ticking still works if the Phase 12 database update is missing.
+    if (result) await saveResult(supabase, itemId, result);
   } else {
     await supabase.from("workout_logs").delete().eq("plan_item_id", itemId);
   }
   refresh();
+}
+
+/** Store reps/seconds/minutes and the weight (converted to kg) on an item's log row. */
+async function saveResult(supabase: Awaited<ReturnType<typeof createClient>>, itemId: string, result: ResultInput) {
+  const profile = await getProfile(supabase);
+  const amount = result.amount ?? null;
+  const weightKg = result.weight == null || !profile ? null : toKg(result.weight, profile.units);
+  if (amount !== null && (!Number.isInteger(amount) || amount < 1 || amount > 1000)) return "Please enter a whole number from 1 to 1000.";
+  if (weightKg !== null && (weightKg <= 0 || weightKg > 500)) return "Please enter a realistic weight.";
+  const { error } = await supabase.from("workout_logs").update({ amount_done: amount, weight_kg: weightKg }).eq("plan_item_id", itemId);
+  if (error) {
+    console.error("[log result]", error.message);
+    return "We could not save that. (Has the Phase 12 database update been run?)";
+  }
+  return null;
 }
 
 /** "Mark as done" / "Undo" buttons. */
@@ -51,9 +76,31 @@ export async function toggleDone(formData: FormData) {
   await setItemDone(String(formData.get("itemId") ?? ""));
 }
 
-/** Workout mode: the last set of an exercise is finished, so tick it (never un-ticks). */
-export async function markDone(itemId: string) {
-  await setItemDone(itemId, true);
+/** Workout mode: the last set of an exercise is finished, so tick it (never un-ticks) and save the numbers. */
+export async function markDone(itemId: string, result?: ResultInput) {
+  await setItemDone(itemId, true, result);
+}
+
+export interface LogState {
+  error?: string;
+  saved?: boolean;
+}
+
+/** "What did you do?" form on a finished exercise card. */
+export async function logResult(_prev: LogState, formData: FormData): Promise<LogState> {
+  const itemId = String(formData.get("itemId") ?? "");
+  const amount = parseAmount(String(formData.get("amount") ?? ""));
+  const weight = parseWeight(String(formData.get("weight") ?? ""));
+  if (amount === "invalid") return { error: "Please enter a whole number from 1 to 1000." };
+  if (weight === "invalid") return { error: "Please enter a weight above 0 (at most 500)." };
+
+  const supabase = await createClient();
+  const { data: log } = await supabase.from("workout_logs").select("id").eq("plan_item_id", itemId).maybeSingle();
+  if (!log) return { error: "Tick the exercise as done first." };
+  const problem = await saveResult(supabase, itemId, { amount, weight });
+  if (problem) return { error: problem };
+  refresh();
+  return { saved: true };
 }
 
 export interface SwapState {

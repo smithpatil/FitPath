@@ -7,6 +7,7 @@ import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 import { getToday } from "@/lib/today.server";
 import { cooldownFor, warmupFor } from "@/lib/routine";
+import { describeResult, isWeighted, suggestionFor } from "@/lib/strength";
 import { restSeconds } from "@/lib/workoutMode";
 import { scheduleGroupsForDay } from "../groups";
 import WorkoutMode, { type WorkoutItem } from "./WorkoutMode";
@@ -53,6 +54,9 @@ export default async function WorkoutPage({ searchParams }: { searchParams: Prom
     unit: i.exercise.unit,
     target: describeTarget(i.sets, i.reps, i.exercise.unit),
     done: i.done,
+    weighted: isWeighted(i.exercise),
+    lastText: i.last ? describeResult(i.last, i.exercise.unit, profile.units) : "",
+    suggestion: isWeighted(i.exercise) ? suggestionFor(i.last, profile.units) : null,
   }));
 
   return (
@@ -63,6 +67,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams: Prom
       title={`${WEEKDAYS[weekdayForSlot(n, chosen.slot)]}: ${groupTitle(scheduleGroupsForDay(chosen.items))}`}
       warmup={warmupFor(profile)}
       cooldown={cooldownFor(profile)}
+      units={profile.units}
     />
   );
 }
