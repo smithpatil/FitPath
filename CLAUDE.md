@@ -15,8 +15,8 @@ AI Coach: the user first dropped it, then re-added it using the FREE **Groq** AP
 - The AI only explains/motivates; the maths chooses exercises. Safety is enforced in our code too (`src/lib/coach/safety.ts`): doctor/physio note on pain/injury/condition, diet note on extreme-diet talk, browser can never send a "system" role, rate limit 8/min/user.
 
 ## Pages (MVP)
-Landing · Sign up/Log in · Onboarding (one question per screen + progress bar) · Dashboard · Workout plan (Mark as done, Swap exercise) · Progress · The Maths Behind It · Settings (profile, kg/lb, delete account).
-Navbar: max 5 items → Today, Plan, Progress, Maths, Settings.
+Landing · Sign up/Log in · Onboarding (one question per screen + progress bar) · Dashboard · Workout plan (Mark as done, Swap exercise) · Progress · Settings (profile, kg/lb, delete account).
+Navbar: Today, Plan, Progress, Settings.
 
 ## Maths requirement (core)
 All maths lives in `src/lib/math/` as pure, well-commented, unit-tested functions (no DB/UI imports):
@@ -28,7 +28,7 @@ All maths lives in `src/lib/math/` as pure, well-commented, unit-tested function
 6. Recurrence + induction — W(n) = W(n-1) + d, closed form W(0) + n·d
 7. DP 0/1 knapsack — maximise benefit within session minutes
 Exercise selection and scheduling come ONLY from these functions.
-"The Maths Behind It" page shows for each: simple definition, formula/diagram, live example from the user's real data.
+(The "Maths Behind It" explanation page was REMOVED at the user's request; it can be restored from git history, commit ea2a095 or earlier. The maths itself still drives every plan.)
 
 ## Content rules
 - 74 seeded, safe, common exercises: 40 for home (bodyweight, dumbbells, bands, pull-up bar) + 25 gym exercises (machines, cables, barbells) + 9 cardio (an 8th muscle group, unit "minutes", conflicts with legs). Warm-up/cool-down moves live in `src/data/warmups.ts` and take a fixed 5 minutes of each day (knapsack capacity = minutes − 5). Fields: muscle group, equipment, difficulty, duration, benefit score. Source of truth: `src/data/exercises.ts`; regenerate `supabase/seed.sql` with `npm run seed:gen` and re-run it in Supabase after any change.

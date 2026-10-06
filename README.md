@@ -2,7 +2,7 @@
 
 A calm, beginner-friendly fitness website. Answer six questions and get a weekly workout plan built by **discrete mathematics** (not AI). Log workouts, see progress, and ask a simple AI coach basic questions.
 
-This is also a discrete-maths course project: see the **The Maths Behind It** page in the app, and `src/lib/math/`.
+This is also a discrete-maths course project: the maths that builds each plan is in `src/lib/math/` (with tests).
 
 ## Tech
 Next.js (App Router) · TypeScript · Tailwind CSS · Supabase (login + database) · Groq (free AI for the coach) · Vitest (tests) · Vercel (hosting)
@@ -28,7 +28,6 @@ Next.js (App Router) · TypeScript · Tailwind CSS · Supabase (login + database
 ```
 src/lib/math/       The 7 maths concepts (pure functions + tests)
 src/lib/planGenerator.ts   Wires the maths together into a weekly plan
-src/lib/mathsExamples.ts   Builds the live examples for the Maths page
 src/lib/coach/      Coach safety rules, prompt and rate limit
 src/data/exercises.ts      The 74 exercises (home + gym + cardio): the single source of truth
 src/app/            Pages (landing, login, onboarding, dashboard, plan, progress, maths, coach, settings)

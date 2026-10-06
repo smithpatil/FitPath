@@ -158,7 +158,6 @@ export async function saveFeeling(formData: FormData) {
     .from("workout_feedback")
     .upsert({ user_id: user.id, week_start: plan.week_start, day, feeling }, { onConflict: "user_id,week_start,day" });
   refresh();
-  revalidatePath("/maths");
 }
 
 export interface RescheduleState {
@@ -199,7 +198,6 @@ export async function rescheduleWeek(): Promise<RescheduleState> {
     }
   }
   refresh();
-  revalidatePath("/maths");
   const placed = plan.missed.length - plan.noRoom.length;
   return {
     message:

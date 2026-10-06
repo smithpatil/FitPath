@@ -1,4 +1,3 @@
-import Link from "next/link";
 import ExerciseCard from "@/components/ExerciseCard";
 import FeedbackCard from "@/components/FeedbackCard";
 import RescheduleCard from "@/components/RescheduleCard";
@@ -126,9 +125,6 @@ export default async function DashboardPage() {
           </div>
         </section>
       )}
-      <p className="text-base text-muted">
-        Curious how this plan was made? <Link href="/maths" className="font-semibold text-accent underline">Read The Maths Behind It</Link>.
-      </p>
     </div>
   );
 }

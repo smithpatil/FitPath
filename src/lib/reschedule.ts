@@ -21,7 +21,7 @@ export interface ReschedulePlan {
   /** Missed slots that have no free day left this week. */
   noRoom: number[];
   consecutiveClashes: number;
-  /** Colouring problem, for showing on the Maths page. */
+  /** The colouring problem that was solved (sessions and their conflict lines). */
   sessions: Session[];
   edges: [string, string][];
 }

@@ -97,9 +97,6 @@ export default async function PlanPage() {
           Out of {EXERCISES.length} exercises, {usableCount} suit your equipment and safety answers. Muscles that work together are placed on
           different days so they can rest. Each day is filled with the most useful exercises that fit in your {profile.minutes} minutes.
         </p>
-        <p className="mt-3">
-          <Link href="/maths" className="font-semibold text-accent underline">See the maths behind it</Link>
-        </p>
       </section>
     </div>
   );
