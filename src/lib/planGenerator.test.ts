@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EXERCISES } from "../data/exercises";
-import { chooseSwap, generatePlan, targetFor, usableFor, weekdayForSlot } from "./planGenerator";
+import { ROUTINE_MINUTES, chooseSwap, exerciseMinutes, generatePlan, targetFor, usableFor, weekdayForSlot } from "./planGenerator";
 import { MUSCLE_CONFLICTS } from "./math/graphColouring";
 import type { Answers } from "./onboarding";
 
@@ -21,8 +21,34 @@ describe("generatePlan", () => {
       for (const minutes of [15, 30, 60]) {
         const plan = generatePlan({ ...base, days, minutes }, 0);
         expect(plan.days).toHaveLength(days);
-        for (const d of plan.days) expect(d.totalMin).toBeLessThanOrEqual(minutes);
+        // the 5-minute warm-up + cool-down come out of the same minutes
+        for (const d of plan.days) expect(d.totalMin + ROUTINE_MINUTES).toBeLessThanOrEqual(minutes);
       }
+  });
+  it("includes cardio somewhere in the week, measured in minutes as one block", () => {
+    for (const equipment of [[], ["gym"]] as Answers["equipment"][]) {
+      const plan = generatePlan({ ...base, equipment, days: 3, minutes: 45 }, 0);
+      const cardio = plan.days.flatMap((d) => d.items).filter((i) => byId(i.exerciseId).muscleGroup === "cardio");
+      expect(cardio.length).toBeGreaterThan(0);
+      for (const c of cardio) {
+        expect(c.sets).toBe(1);
+        expect(c.reps).toBe(byId(c.exerciseId).durationMin);
+      }
+    }
+  });
+  it("cardio and legs never share a day when days ≥ 3 (they conflict in the graph)", () => {
+    const plan = generatePlan({ ...base, days: 4 }, 0);
+    for (const d of plan.days) expect(d.groups.includes("cardio") && d.groups.includes("legs")).toBe(false);
+  });
+  it("sore knees get no jumping cardio", () => {
+    const ids = usableFor({ ...base, limitations: ["knee"] }).map((e) => e.id);
+    expect(ids).not.toContain("jumping-jacks");
+    expect(ids).not.toContain("high-knees");
+    expect(ids).toContain("brisk-walk");
+  });
+  it("exerciseMinutes leaves room for the warm-up and cool-down", () => {
+    expect(exerciseMinutes(30)).toBe(25);
+    expect(exerciseMinutes(3)).toBe(0);
   });
   it("only uses usable exercises (equipment + safety rules)", () => {
     const profile: Answers = { ...base, level: "some_experience", equipment: ["dumbbells"], limitations: ["knee", "wrist"] };

@@ -31,7 +31,7 @@ Exercise selection and scheduling come ONLY from these functions.
 "The Maths Behind It" page shows for each: simple definition, formula/diagram, live example from the user's real data.
 
 ## Content rules
-- 65 seeded, safe, common exercises: 40 for home (bodyweight, dumbbells, bands, pull-up bar) + 25 gym exercises (machines, cables, barbells). Fields: muscle group, equipment, difficulty, duration, benefit score. Source of truth: `src/data/exercises.ts`; regenerate `supabase/seed.sql` with `npm run seed:gen` and re-run it in Supabase after any change.
+- 74 seeded, safe, common exercises: 40 for home (bodyweight, dumbbells, bands, pull-up bar) + 25 gym exercises (machines, cables, barbells) + 9 cardio (an 8th muscle group, unit "minutes", conflicts with legs). Warm-up/cool-down moves live in `src/data/warmups.ts` and take a fixed 5 minutes of each day (knapsack capacity = minutes − 5). Fields: muscle group, equipment, difficulty, duration, benefit score. Source of truth: `src/data/exercises.ts`; regenerate `supabase/seed.sql` with `npm run seed:gen` and re-run it in Supabase after any change.
 - Equipment "gym" = every kind of equipment (set theory: U becomes the whole universe). Gym exercises require "gym".
 - Session minutes are PER WORKOUT DAY, not per week.
 - Never give medical or extreme-diet advice; if pain/injury/condition is mentioned, advise a doctor or physio.

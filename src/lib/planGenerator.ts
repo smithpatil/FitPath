@@ -60,6 +60,8 @@ export const weekdayForSlot = (daysUsed: number, slot: number): number =>
  * steps = S(n) = m₁ + … + mₙ from the adaptive overload (equals n when every week felt "just right").
  */
 export function targetFor(ex: Exercise, profile: Pick<Answers, "goal" | "level">, steps: number) {
+  // Cardio is one continuous block of minutes; its length stays fixed so the day's time budget holds.
+  if (ex.unit === "minutes") return { sets: 1, reps: ex.durationMin };
   const sets = profile.level === "beginner" ? 2 : 3;
   if (ex.unit === "seconds") {
     const w0 = profile.level === "beginner" ? 20 : 30;
@@ -68,6 +70,12 @@ export function targetFor(ex: Exercise, profile: Pick<Answers, "goal" | "level">
   const w0 = profile.goal === "lose_weight" ? 12 : profile.goal === "build_strength" ? 8 : 10;
   return { sets, reps: Math.min(overloadClosedForm(w0, 1, steps), w0 + 6) };
 }
+
+/** Every workout day starts with a 3-minute warm-up and ends with a 2-minute cool-down. */
+export const ROUTINE_MINUTES = 5;
+
+/** Minutes left for the main exercises (this is the knapsack's capacity). */
+export const exerciseMinutes = (minutes: number): number => Math.max(0, minutes - ROUTINE_MINUTES);
 
 /** Best exercise of a group: highest benefit, then shorter, then by id (so results never wobble). */
 const bestOf = (list: Exercise[]) =>
@@ -97,14 +105,15 @@ export function generatePlan(profile: Answers, steps: number, all: Exercise[] = 
     const reservedMin = reserved.reduce((s, e) => s + e.durationMin, 0);
     const toItem = (e: Exercise) => ({ id: e.id, weight: e.durationMin, value: e.benefit });
 
+    const capacity = exerciseMinutes(profile.minutes); // warm-up and cool-down come out of the same minutes
     let chosenIds: string[];
-    if (reservedMin <= profile.minutes) {
+    if (reservedMin <= capacity) {
       const rest = candidates.filter((e) => !reserved.includes(e));
-      const extra = knapsack(rest.map(toItem), profile.minutes - reservedMin);
+      const extra = knapsack(rest.map(toItem), capacity - reservedMin);
       chosenIds = [...reserved.map((e) => e.id), ...extra.chosenIds];
     } else {
       // Not enough time for one of each: pick the best subset of the reserved ones.
-      chosenIds = knapsack(reserved.map(toItem), profile.minutes).chosenIds;
+      chosenIds = knapsack(reserved.map(toItem), capacity).chosenIds;
     }
 
     const chosen = chosenIds
@@ -144,7 +153,7 @@ function fillSpareTime(
     graph.edges.some(([x, y]) => (x === a && y === b) || (x === b && y === a));
 
   for (const day of days) {
-    const spare = profile.minutes - day.totalMin;
+    const spare = exerciseMinutes(profile.minutes) - day.totalMin;
     if (spare <= 0) continue;
     const nearGroups = days.filter((d) => Math.abs(d.slot - day.slot) <= 1).flatMap((d) => d.groups);
     const eligible = usable.filter(

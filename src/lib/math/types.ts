@@ -1,6 +1,6 @@
 // Shared types for the maths library. Plain data only: no database or UI code.
 
-export type MuscleGroup = "legs" | "glutes" | "chest" | "back" | "shoulders" | "arms" | "core";
+export type MuscleGroup = "legs" | "glutes" | "chest" | "back" | "shoulders" | "arms" | "core" | "cardio";
 
 export type Equipment = "bodyweight" | "dumbbells" | "resistance_band" | "pull_up_bar" | "gym";
 
@@ -26,8 +26,9 @@ export interface Exercise {
   impact: "low" | "high";
   /** Safety tags, e.g. "knee_load". Used by the logic rules. */
   tags: SafetyTag[];
-  /** "reps" = how many times you repeat the movement, "seconds" = how long you hold it. */
-  unit: "reps" | "seconds";
+  /** "reps" = how many times you repeat the movement, "seconds" = how long you hold it,
+   *  "minutes" = how long you keep going (cardio). */
+  unit: "reps" | "seconds" | "minutes";
   /** Ids of the slightly easier exercises this one builds on (progression). */
   easierIds: string[];
   howTo: string;

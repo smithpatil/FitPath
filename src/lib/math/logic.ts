@@ -59,7 +59,7 @@ export const isExcluded = (v: Valuation): boolean => firedRules(v).length > 0;
 /** Turn one user + one exercise into the true/false facts the rules use. */
 export function valuationFor(
   user: { level: Level; limitations: Limitation[] },
-  ex: Exercise,
+  ex: Pick<Exercise, "impact" | "tags"> & { difficulty?: Exercise["difficulty"] },
 ): Valuation {
   const v: Valuation = {
     beginner: user.level === "beginner",

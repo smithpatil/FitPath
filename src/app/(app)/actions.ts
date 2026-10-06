@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { EXERCISES } from "@/data/exercises";
 import { toISODate } from "@/lib/dates";
-import { chooseSwap, targetFor, usableFor } from "@/lib/planGenerator";
+import { chooseSwap, exerciseMinutes, targetFor, usableFor } from "@/lib/planGenerator";
 import { getOverload } from "@/lib/planStore";
 import { getToday } from "@/lib/today.server";
 import { getProfile } from "@/lib/profile";
@@ -76,7 +76,7 @@ export async function swapExercise(_prev: SwapState, formData: FormData): Promis
   const todayIds = (dayRows ?? []).map((r) => r.exercise_id);
   const todayMinutes = todayIds.reduce((s, id) => s + (EXERCISES.find((e) => e.id === id)?.durationMin ?? 0), 0);
 
-  const replacement = chooseSwap(current, usableFor(profile), todayIds, todayMinutes, profile.minutes);
+  const replacement = chooseSwap(current, usableFor(profile), todayIds, todayMinutes, exerciseMinutes(profile.minutes));
   if (!replacement) return { error: "No other similar exercise fits your equipment, safety needs and time. Keep this one for now." };
 
   const { data: plan } = await supabase.from("plans").select("week_start").eq("id", item.plan_id).single();

@@ -5,13 +5,19 @@ import { useEffect, useRef, useState } from "react";
 import { markDone } from "@/app/(app)/actions";
 import { finishesExercise, formatClock, initialState, workoutReducer, type WorkoutAction, type WorkoutState } from "@/lib/workoutMode";
 
+export interface RoutineStep {
+  name: string;
+  seconds: number;
+  howTo: string;
+}
+
 export interface WorkoutItem {
   id: string;
   name: string;
   howTo: string;
   sets: number;
   reps: number;
-  unit: "reps" | "seconds";
+  unit: "reps" | "seconds" | "minutes";
   target: string;
   done: boolean;
 }
@@ -22,17 +28,23 @@ export default function WorkoutMode({
   restSecs,
   daySlot,
   title,
+  warmup,
+  cooldown,
 }: {
   items: WorkoutItem[];
   restSecs: number;
   daySlot: number;
   title: string;
+  warmup: RoutineStep[];
+  cooldown: RoutineStep[];
 }) {
   const [state, setState] = useState<WorkoutState>(() => initialState(items.map((i) => i.done)));
   const [doneIds, setDoneIds] = useState(() => new Set(items.filter((i) => i.done).map((i) => i.id)));
   const [endsAt, setEndsAt] = useState<number | null>(null); // when the running timer reaches 0
   const [now, setNow] = useState(() => Date.now());
   const [saveError, setSaveError] = useState(false);
+  // Show the warm-up first, unless the workout has already been started.
+  const [warmedUp, setWarmedUp] = useState(() => items.some((i) => i.done));
 
   const steps = items.map((i) => ({ sets: i.sets }));
   const item = items[state.index];
@@ -54,10 +66,13 @@ export default function WorkoutMode({
     setEndsAt(next.phase === "resting" ? Date.now() + restSecs * 1000 : null);
   }
 
+  // Timed moves count down their seconds; cardio counts down its minutes.
+  const holdSeconds = (it: WorkoutItem) => (it.unit === "minutes" ? it.reps * 60 : it.reps);
+
   function startHold() {
     apply({ type: "startHold" });
     setNow(Date.now());
-    setEndsAt(Date.now() + item.reps * 1000);
+    setEndsAt(Date.now() + holdSeconds(item) * 1000);
   }
 
   function endRest() {
@@ -104,7 +119,9 @@ export default function WorkoutMode({
       : state.phase === "resting"
         ? `Rest for ${formatClock(restSecs)}. Up next: ${item.name}, set ${state.set} of ${item.sets}.`
         : state.phase === "holding"
-          ? `Hold for ${item.reps} seconds.`
+          ? item.unit === "minutes"
+            ? `Keep going for ${item.reps} minutes.`
+            : `Hold for ${item.reps} seconds.`
           : `${item.name}, set ${state.set} of ${item.sets}.`;
 
   const big = "rounded-full px-8 py-4 text-lg font-semibold";
@@ -142,10 +159,24 @@ export default function WorkoutMode({
       </p>
 
       <section className="mt-8 rounded-2xl border-2 border-gray-200 p-6">
-        {state.phase === "complete" ? (
+        {!warmedUp && state.phase !== "complete" ? (
+          <div>
+            <p className="text-base font-semibold text-accent">Step 1</p>
+            <h2 className="mt-1 text-3xl font-bold">Warm-up (about {Math.round(warmup.reduce((s, m) => s + m.seconds, 0) / 60)} minutes)</h2>
+            <p className="mt-2 text-muted">Gently get your body moving. Go at an easy pace.</p>
+            <RoutineList moves={warmup} />
+            <button type="button" onClick={() => setWarmedUp(true)} className={`${primary} mt-8`}>
+              I&apos;m warmed up: start exercises
+            </button>
+          </div>
+        ) : state.phase === "complete" ? (
           <div className="text-center">
             <h2 className="text-3xl font-bold text-accent-dark">Workout complete!</h2>
-            <p className="mt-3 text-muted">Brilliant work. Take a moment to stretch and drink some water.</p>
+            <p className="mt-3 text-muted">Brilliant work. Finish with this cool-down, then drink some water.</p>
+            <div className="mx-auto mt-6 max-w-md text-left">
+              <h3 className="text-xl font-semibold">Cool-down (about {Math.round(cooldown.reduce((s, m) => s + m.seconds, 0) / 60)} minutes)</h3>
+              <RoutineList moves={cooldown} />
+            </div>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link href={`/plan#day-${daySlot}`} className={primary}>
                 Rate how it felt
@@ -181,7 +212,9 @@ export default function WorkoutMode({
             </p>
             <h2 className="mt-1 text-3xl font-bold">{item.name}</h2>
             <p className="mt-2 text-xl font-medium text-accent-dark">
-              Set {state.set} of {item.sets}: {item.unit === "seconds" ? `hold for ${item.reps} seconds` : `${item.reps} reps`}
+              {item.unit === "minutes"
+                ? `Keep going for ${item.reps} minutes at a comfortable pace`
+                : `Set ${state.set} of ${item.sets}: ${item.unit === "seconds" ? `hold for ${item.reps} seconds` : `${item.reps} reps`}`}
             </p>
             <p className="mt-4">
               <strong>How to do it: </strong>
@@ -190,7 +223,7 @@ export default function WorkoutMode({
 
             {state.phase === "holding" ? (
               <div className="mt-8 text-center">
-                <p className="text-base text-muted">Hold…</p>
+                <p className="text-base text-muted">{item.unit === "minutes" ? "Keep going…" : "Hold…"}</p>
                 <p role="timer" className="font-mono text-7xl font-bold text-accent-dark">
                   {formatClock(remaining)}
                 </p>
@@ -200,7 +233,11 @@ export default function WorkoutMode({
               </div>
             ) : (
               <div className="mt-8">
-                {item.unit === "seconds" ? (
+                {item.unit === "minutes" ? (
+                  <button type="button" onClick={startHold} className={primary}>
+                    Start {item.reps}-minute timer
+                  </button>
+                ) : item.unit === "seconds" ? (
                   <button type="button" onClick={startHold} className={primary}>
                     Start {item.reps}-second hold
                   </button>
@@ -247,5 +284,20 @@ export default function WorkoutMode({
       </ol>
       <p className="mt-6 text-sm text-muted">Move slowly and stop if anything hurts.</p>
     </div>
+  );
+}
+
+/** A simple list of warm-up or cool-down moves with their times. */
+function RoutineList({ moves }: { moves: RoutineStep[] }) {
+  return (
+    <ol className="mt-4 space-y-3">
+      {moves.map((m) => (
+        <li key={m.name} className="rounded-xl bg-accent-soft px-4 py-3">
+          <strong>{m.name}</strong> <span className="text-muted">· {m.seconds} seconds</span>
+          <br />
+          <span className="text-base">{m.howTo}</span>
+        </li>
+      ))}
+    </ol>
   );
 }

@@ -3,6 +3,7 @@ import { WEEKDAYS } from "@/lib/dates";
 import { createLimiter } from "@/lib/coach/rateLimit";
 import { sanitizeMessages, withSafetyNotes } from "@/lib/coach/safety";
 import { buildSystemPrompt } from "@/lib/coach/systemPrompt";
+import { describeTarget } from "@/lib/labels";
 import { EQUIPMENT, GOALS, LEVELS, LIMITATIONS } from "@/lib/onboarding";
 import { weekdayForSlot } from "@/lib/planGenerator";
 import { getCurrentWeek } from "@/lib/planStore";
@@ -42,9 +43,7 @@ export async function POST(request: Request) {
 
   // Give the AI the user's plan so it can answer questions about it (it cannot change it).
   const plan = week.days.map((d) => {
-    const items = d.items.map(
-      (i) => `${i.exercise.name} (${i.sets} sets of ${i.reps} ${i.exercise.unit === "seconds" ? "seconds" : "reps"})`,
-    );
+    const items = d.items.map((i) => `${i.exercise.name} (${describeTarget(i.sets, i.reps, i.exercise.unit)})`);
     return `${WEEKDAYS[weekdayForSlot(week.days.length, d.slot)]}: ${items.join(", ")}`;
   });
   const system = buildSystemPrompt({

@@ -15,7 +15,7 @@ export interface Graph {
   edges: Edge[];
 }
 
-export const MUSCLE_GROUPS: MuscleGroup[] = ["legs", "glutes", "chest", "back", "shoulders", "arms", "core"];
+export const MUSCLE_GROUPS: MuscleGroup[] = ["legs", "glutes", "chest", "back", "shoulders", "arms", "core", "cardio"];
 
 /** Groups that share muscles or joints, so they should get rest between sessions. */
 export const MUSCLE_CONFLICTS: Edge[] = [
@@ -24,6 +24,7 @@ export const MUSCLE_CONFLICTS: Edge[] = [
   ["chest", "arms"], // triceps help with pressing
   ["shoulders", "arms"],
   ["back", "arms"], // biceps help with pulling
+  ["cardio", "legs"], // walking, cycling and rowing all work the legs
 ];
 
 export const muscleGraph: Graph = { vertices: MUSCLE_GROUPS, edges: MUSCLE_CONFLICTS };
@@ -100,44 +101,53 @@ export interface DaySchedule {
  * Assign every muscle group to one of `days` training slots.
  * Best schedule = fewest same-day conflicts first, then fewest consecutive-day conflicts,
  * then the most even spread. Slots are treated as back-to-back days (the cautious choice).
- * Brute force over every assignment (days^groups ≤ 6^7 ≈ 280k) keeps the result provably optimal.
+ * The search tries every assignment, so the result is provably optimal, but it uses
+ * BRANCH AND BOUND to stay fast: the score is built up as groups are placed, and a partial
+ * schedule that already scores no better than the best complete one is abandoned
+ * (scores only ever go up as more groups are placed).
  * If days < χ(G), same-day clashes are unavoidable: the pigeonhole principle.
  */
 export function scheduleGroups(g: Graph, days: number): DaySchedule {
   const n = g.vertices.length;
   const idx = new Map(g.vertices.map((v, i) => [v, i]));
-  const edges = g.edges.map(([a, b]) => [idx.get(a)!, idx.get(b)!] as const);
+  // For each group, its conflict partners that are placed BEFORE it in the search order.
+  const earlier: number[][] = Array.from({ length: n }, () => []);
+  for (const [a, b] of g.edges) {
+    const i = idx.get(a)!;
+    const j = idx.get(b)!;
+    earlier[Math.max(i, j)].push(Math.min(i, j));
+  }
   const mustFill = days <= n; // every training day needs at least one muscle group
   const assign = new Array<number>(n).fill(0);
+  const sizes = new Array<number>(days).fill(0);
   let best: { cost: number; assign: number[] } | null = null;
 
-  const cost = (): number => {
-    let same = 0;
-    let consecutive = 0;
-    for (const [a, b] of edges) {
-      const gap = Math.abs(assign[a] - assign[b]);
-      if (gap === 0) same++;
-      else if (gap === 1) consecutive++;
-    }
-    const sizes = new Array<number>(days).fill(0);
-    for (const d of assign) sizes[d]++;
-    if (mustFill && sizes.some((s) => s === 0)) return Infinity;
-    const spread = sizes.reduce((s, x) => s + x * x, 0); // lower = more even (max 49 < 100)
-    return same * 10000 + consecutive * 100 + spread;
-  };
-
-  const search = (i: number) => {
+  // Score = same-day clashes × 10000 + back-to-back clashes × 100 + Σ(day size)²  (lower is better;
+  // the last part rewards an even spread and is at most 8² = 64 < 100).
+  const search = (i: number, same: number, consecutive: number, spread: number) => {
+    const score = same * 10000 + consecutive * 100 + spread;
+    if (best !== null && score >= best.cost) return; // bound: cannot beat the best any more
+    const emptyDays = sizes.filter((s) => s === 0).length;
+    if (mustFill && n - i < emptyDays) return; // too few groups left to fill every day
     if (i === n) {
-      const c = cost();
-      if (best === null || c < best.cost) best = { cost: c, assign: [...assign] };
+      best = { cost: score, assign: [...assign] };
       return;
     }
     for (let d = 0; d < days; d++) {
+      let s2 = same;
+      let c2 = consecutive;
+      for (const j of earlier[i]) {
+        const gap = Math.abs(assign[j] - d);
+        if (gap === 0) s2++;
+        else if (gap === 1) c2++;
+      }
       assign[i] = d;
-      search(i + 1);
+      sizes[d]++;
+      search(i + 1, s2, c2, spread + 2 * sizes[d] - 1); // (k+1)² − k² = 2k + 1
+      sizes[d]--;
     }
   };
-  search(0);
+  search(0, 0, 0, 0);
 
   const chosen = best!.assign;
   const dayOf: Record<string, number> = {};

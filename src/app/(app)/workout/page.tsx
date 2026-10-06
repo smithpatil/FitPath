@@ -6,6 +6,7 @@ import { getCurrentWeek } from "@/lib/planStore";
 import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 import { getToday } from "@/lib/today.server";
+import { cooldownFor, warmupFor } from "@/lib/routine";
 import { restSeconds } from "@/lib/workoutMode";
 import { scheduleGroupsForDay } from "../groups";
 import WorkoutMode, { type WorkoutItem } from "./WorkoutMode";
@@ -60,6 +61,8 @@ export default async function WorkoutPage({ searchParams }: { searchParams: Prom
       restSecs={restSeconds(profile.level)}
       daySlot={chosen.slot}
       title={`${WEEKDAYS[weekdayForSlot(n, chosen.slot)]}: ${groupTitle(scheduleGroupsForDay(chosen.items))}`}
+      warmup={warmupFor(profile)}
+      cooldown={cooldownFor(profile)}
     />
   );
 }

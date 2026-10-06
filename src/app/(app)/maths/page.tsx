@@ -641,6 +641,10 @@ export default async function MathsPage() {
             </p>
             <div className="rounded-xl bg-white p-4">
               <p className="font-semibold">The same idea on your real day 1 ({knap.fullDay.capacity} minutes)</p>
+              <p className="mt-1 text-base text-muted">
+                Capacity T = your {knap.fullDay.capacity + 5} minutes − 5 minutes kept for the warm-up and cool-down = {knap.fullDay.capacity}{" "}
+                minutes.
+              </p>
               <p className="mt-2">
                 The knapsack chose <strong>{knap.fullDay.names.length}</strong> exercises worth a total benefit of{" "}
                 <strong>{knap.fullDay.benefit}</strong> in <strong>{knap.fullDay.totalMin}</strong> minutes:

@@ -37,7 +37,7 @@ import {
 import { doableExercises, userEquipmentSet } from "./math/sets";
 import type { Edge, Exercise } from "./math/types";
 import type { Answers } from "./onboarding";
-import { targetFor, usableFor } from "./planGenerator";
+import { exerciseMinutes, targetFor, usableFor } from "./planGenerator";
 
 const byId = (id: string) => EXERCISES.find((e) => e.id === id)!;
 
@@ -225,14 +225,14 @@ export function buildMathsExamples(
     const toItem = (e: Exercise) => ({ id: e.id, name: e.name, weight: e.durationMin, value: e.benefit });
     const mini = candidates.slice(0, 6).map(toItem);
     const capacity = 15;
-    const full = knapsack(candidates.map(toItem), profile.minutes);
+    const full = knapsack(candidates.map(toItem), exerciseMinutes(profile.minutes));
     knap = {
       dayNumber: 1,
       items: mini,
       capacity,
       result: knapsack(mini, capacity),
       fullDay: {
-        capacity: profile.minutes,
+        capacity: exerciseMinutes(profile.minutes),
         names: full.chosenIds.map((id) => byId(id).name),
         totalMin: full.totalWeight,
         benefit: full.bestValue,

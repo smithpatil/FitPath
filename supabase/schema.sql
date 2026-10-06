@@ -5,14 +5,14 @@
 create table if not exists public.exercises (
   id           text primary key,
   name         text not null,
-  muscle_group text not null check (muscle_group in ('legs','glutes','chest','back','shoulders','arms','core')),
+  muscle_group text not null check (muscle_group in ('legs','glutes','chest','back','shoulders','arms','core','cardio')),
   equipment    text[] not null,
   difficulty   int  not null check (difficulty between 1 and 3),
   duration_min int  not null check (duration_min > 0),
   benefit      int  not null check (benefit between 1 and 10),
   impact       text not null check (impact in ('low','high')),
   tags         text[] not null default '{}',
-  unit         text not null check (unit in ('reps','seconds')),
+  unit         text not null check (unit in ('reps','seconds','minutes')),
   easier_ids   text[] not null default '{}',
   how_to       text not null
 );

@@ -42,7 +42,7 @@ describe.each(Object.entries(profiles))("maths examples for %s", (_name, profile
   it("knapsack example never exceeds its capacity", () => {
     expect(ex.knapsack).not.toBeNull();
     expect(ex.knapsack!.result.totalWeight).toBeLessThanOrEqual(ex.knapsack!.capacity);
-    expect(ex.knapsack!.fullDay.totalMin).toBeLessThanOrEqual(profile.minutes);
+    expect(ex.knapsack!.fullDay.totalMin).toBeLessThanOrEqual(profile.minutes - 5);
   });
   it("partial-order diagram, when present, is a genuine partial order", () => {
     if (ex.relations.properties) expect(ex.relations.properties.isPartialOrder).toBe(true);

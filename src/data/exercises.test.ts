@@ -3,9 +3,9 @@ import { EXERCISES } from "./exercises";
 import { MUSCLE_GROUPS } from "../lib/math/graphColouring";
 
 describe("exercise database", () => {
-  it("has 65 exercises (40 home + 25 gym) with unique ids", () => {
-    expect(EXERCISES).toHaveLength(65);
-    expect(new Set(EXERCISES.map((e) => e.id)).size).toBe(65);
+  it("has 74 exercises (40 home + 25 gym + 9 cardio) with unique ids", () => {
+    expect(EXERCISES).toHaveLength(74);
+    expect(new Set(EXERCISES.map((e) => e.id)).size).toBe(74);
   });
   it("every progression link points to a real exercise", () => {
     const ids = new Set(EXERCISES.map((e) => e.id));

@@ -9,12 +9,14 @@ export const GROUP_LABEL: Record<string, string> = {
   shoulders: "Shoulders",
   arms: "Arms",
   core: "Tummy and core",
+  cardio: "Cardio (heart and lungs)",
 };
 
 export const groupTitle = (groups: string[]) => groups.map((g) => GROUP_LABEL[g] ?? g).join(" + ");
 
-/** "2 sets of 8 reps" or "2 sets of 20 seconds". */
+/** "2 sets of 8 reps", "2 sets of 20 seconds" or "10 minutes" (cardio). */
 export function describeTarget(sets: number, reps: number, unit: Exercise["unit"]): string {
+  if (unit === "minutes") return `${reps} minutes`;
   return `${sets} sets of ${reps} ${unit === "seconds" ? "seconds" : "reps"}`;
 }
 

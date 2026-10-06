@@ -3,7 +3,9 @@ import ExerciseCard from "@/components/ExerciseCard";
 import FeedbackCard from "@/components/FeedbackCard";
 import { WEEKDAYS } from "@/lib/dates";
 import { groupTitle } from "@/lib/labels";
-import { usableFor, weekdayForSlot } from "@/lib/planGenerator";
+import { ROUTINE_MINUTES, exerciseMinutes, usableFor, weekdayForSlot } from "@/lib/planGenerator";
+import { cooldownFor, totalSeconds, warmupFor } from "@/lib/routine";
+import type { RoutineMove } from "@/data/warmups";
 import { getCurrentWeek } from "@/lib/planStore";
 import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
@@ -21,6 +23,8 @@ export default async function PlanPage() {
   const week = await getCurrentWeek(supabase, user!.id, profile);
   const daysUsed = week.days.length;
   const usableCount = usableFor(profile).length;
+  const warmup = warmupFor(profile);
+  const cooldown = cooldownFor(profile);
 
   return (
     <div className="space-y-10">
@@ -51,8 +55,8 @@ export default async function PlanPage() {
               {WEEKDAYS[weekdayForSlot(daysUsed, d.slot)]}
             </h2>
             <p className="mt-1 text-muted">
-              {groupTitle(scheduleGroupsForDay(d.items))} · about {d.items.reduce((s, i) => s + i.exercise.durationMin, 0)} minutes
-              (your limit is {profile.minutes} minutes for each workout day)
+              {groupTitle(scheduleGroupsForDay(d.items))} · about {d.items.reduce((s, i) => s + i.exercise.durationMin, 0) + ROUTINE_MINUTES}{" "}
+              minutes including warm-up and cool-down (your limit is {profile.minutes} minutes for each workout day)
             </p>
             {d.items.some((i) => !i.done) && (
               <p className="mt-2">
@@ -61,16 +65,18 @@ export default async function PlanPage() {
                 </Link>
               </p>
             )}
-            {d.items.reduce((s, i) => s + i.exercise.durationMin, 0) < profile.minutes * 0.7 && (
+            {d.items.reduce((s, i) => s + i.exercise.durationMin, 0) < exerciseMinutes(profile.minutes) * 0.7 && (
               <p className="mt-1 text-base text-muted">
                 This workout is shorter than your limit because your equipment and safety answers leave fewer moves to choose from.
               </p>
             )}
+            <RoutineBox title="Warm-up first" moves={warmup} />
             <ul className="mt-5 space-y-4">
               {d.items.map((item) => (
                 <ExerciseCard key={item.id} item={item} />
               ))}
             </ul>
+            <RoutineBox title="Then cool down" moves={cooldown} />
             {d.items.length > 0 && d.items.every((i) => i.done) && (
               <FeedbackCard planId={week.planId} day={d.slot} feeling={d.feeling} />
             )}
@@ -88,6 +94,18 @@ export default async function PlanPage() {
           <Link href="/maths" className="font-semibold text-accent underline">See the maths behind it</Link>
         </p>
       </section>
+    </div>
+  );
+}
+
+/** Warm-up / cool-down summary for one day. */
+function RoutineBox({ title, moves }: { title: string; moves: RoutineMove[] }) {
+  return (
+    <div className="mt-5 rounded-2xl bg-accent-soft px-5 py-4">
+      <p className="font-semibold text-accent-dark">
+        {title} · about {Math.round(totalSeconds(moves) / 60)} minutes
+      </p>
+      <p className="mt-1 text-base">{moves.map((m) => `${m.name} (${m.seconds} s)`).join(" · ")}</p>
     </div>
   );
 }
