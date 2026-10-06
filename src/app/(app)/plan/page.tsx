@@ -1,9 +1,11 @@
 import Link from "next/link";
 import ExerciseCard from "@/components/ExerciseCard";
 import FeedbackCard from "@/components/FeedbackCard";
-import { WEEKDAYS } from "@/lib/dates";
+import RescheduleCard from "@/components/RescheduleCard";
+import { WEEKDAYS, weekdayIndex } from "@/lib/dates";
+import { getToday } from "@/lib/today.server";
 import { groupTitle } from "@/lib/labels";
-import { ROUTINE_MINUTES, exerciseMinutes, usableFor, weekdayForSlot } from "@/lib/planGenerator";
+import { ROUTINE_MINUTES, exerciseMinutes, usableFor } from "@/lib/planGenerator";
 import { cooldownFor, totalSeconds, warmupFor } from "@/lib/routine";
 import type { RoutineMove } from "@/data/warmups";
 import { getCurrentWeek } from "@/lib/planStore";
@@ -22,6 +24,8 @@ export default async function PlanPage() {
   const profile = (await getProfile(supabase))!;
   const week = await getCurrentWeek(supabase, user!.id, profile);
   const daysUsed = week.days.length;
+  const todayWeekday = weekdayIndex(await getToday());
+  const missed = week.days.filter((d) => d.weekday < todayWeekday && !d.items.some((i) => i.done));
   const usableCount = usableFor(profile).length;
   const warmup = warmupFor(profile);
   const cooldown = cooldownFor(profile);
@@ -46,13 +50,16 @@ export default async function PlanPage() {
         <p className="mt-3 text-base">Move slowly, breathe normally, and stop if anything hurts.</p>
       </section>
 
+      {missed.length > 0 && <RescheduleCard missedDays={missed.map((d) => WEEKDAYS[d.weekday])} />}
+
       {daysUsed === 0 ? (
         <p className="text-muted">We could not build a plan from your answers. Try changing your equipment or limits in Settings.</p>
       ) : (
         week.days.map((d) => (
           <section key={d.slot} aria-labelledby={`day-${d.slot}`}>
             <h2 id={`day-${d.slot}`} className="text-2xl font-bold">
-              {WEEKDAYS[weekdayForSlot(daysUsed, d.slot)]}
+              {WEEKDAYS[d.weekday]}
+              {missed.includes(d) && <span className="ml-3 rounded-full bg-amber-200 px-3 py-0.5 align-middle text-base font-medium text-amber-950">Missed</span>}
             </h2>
             <p className="mt-1 text-muted">
               {groupTitle(scheduleGroupsForDay(d.items))} · about {d.items.reduce((s, i) => s + i.exercise.durationMin, 0) + ROUTINE_MINUTES}{" "}

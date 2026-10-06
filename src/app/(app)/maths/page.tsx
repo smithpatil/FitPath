@@ -12,6 +12,9 @@ import { WEIGHT_STEP, suggestNextWeight } from "@/lib/strength";
 import { fromKg } from "@/lib/units";
 import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
+import { WEEKDAYS, weekdayIndex } from "@/lib/dates";
+import { planReschedule } from "@/lib/reschedule";
+import { getToday } from "@/lib/today.server";
 
 export const metadata = { title: "The Maths Behind It — FitPath" };
 
@@ -47,6 +50,19 @@ export default async function MathsPage() {
     week.multipliers,
   );
   const { sets, logic, relations, graph, counting, recurrence, knapsack: knap } = ex;
+
+  // Missed-workout rescheduling: the colouring problem for the rest of THIS week.
+  const todayWeekday = weekdayIndex(await getToday());
+  const resched = planReschedule(
+    week.days.map((d) => ({
+      slot: d.slot,
+      groups: [...new Set(d.items.map((i) => i.exercise.muscleGroup as string))],
+      weekday: d.weekday,
+      started: d.items.some((i) => i.done),
+    })),
+    todayWeekday,
+  );
+  const slotLabel = (slot: number) => `Workout ${slot + 1}`;
 
   // Colour classes for the graph section: colour number → muscle groups
   const classes = new Map<number, string[]>();
@@ -355,6 +371,69 @@ export default async function MathsPage() {
             ` You train on fewer days than χ = ${graph.chromaticNumber}, so a same-day clash cannot be avoided.`} Your final plan may also add a
           second helping of a muscle group on a day with spare time, but only a group that does not conflict with the ones around it.
         </p>
+
+        {/* Graph colouring with pre-coloured vertices: rescheduling a missed workout */}
+        <div className="rounded-xl bg-white p-4">
+          <p className="text-lg font-semibold">Missed a workout? Colouring with some colours already fixed</p>
+          <p className="mt-2">
+            When a workout day passes without any exercise done, the rest of your week becomes a new colouring problem. Now the dots are your{" "}
+            <strong>workout sessions</strong> and the colours are the <strong>days of the week</strong>:
+          </p>
+          <ul className="mt-2 list-disc space-y-1 pl-6">
+            <li>A session you have already started is a <strong>pre-coloured vertex</strong>: it keeps its day.</li>
+            <li>Two sessions on the same day are never allowed (one workout a day).</li>
+            <li>Two sessions that share or strain the same muscles should be at least <strong>2 days apart</strong>. This is a known graph problem called an L(2,1) labelling.</li>
+            <li>A missed session prefers today; an upcoming one prefers the day it was already on.</li>
+          </ul>
+          <Formula>
+            colour(u) ≠ colour(v)  for all sessions u ≠ v<br />
+            |colour(u) − colour(v)| ≥ 2  for conflicting u, v   (counted, and made as few as possible)<br />
+            if sessions to place &gt; free days, at least (sessions − free days) cannot fit  (pigeonhole)
+          </Formula>
+          <p className="mt-3 font-semibold">Your week right now (today is {WEEKDAYS[todayWeekday]})</p>
+          <div className="mt-2 overflow-x-auto">
+            <table className="w-full min-w-[420px] border-collapse text-left text-base">
+              <thead>
+                <tr>
+                  {["Session", "Muscle groups", "Day now", "Status", "If rescheduled now"].map((h) => (
+                    <th key={h} scope="col" className="border border-gray-300 px-3 py-2">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {resched.sessions.map((s) => {
+                  const slot = Number(s.id);
+                  const day = week.days.find((d) => d.slot === slot)!;
+                  const isMissed = resched.missed.includes(slot);
+                  return (
+                    <tr key={s.id}>
+                      <td className="border border-gray-300 px-3 py-2">{slotLabel(slot)}</td>
+                      <td className="border border-gray-300 px-3 py-2">{s.groups.map(grp).join(" + ")}</td>
+                      <td className="border border-gray-300 px-3 py-2">{WEEKDAYS[day.weekday]}</td>
+                      <td className="border border-gray-300 px-3 py-2">
+                        {s.fixedDay !== undefined ? "started: fixed" : isMissed ? "missed" : "upcoming"}
+                      </td>
+                      <td className="border border-gray-300 px-3 py-2">
+                        {resched.noRoom.includes(slot) ? "no room" : WEEKDAYS[resched.newWeekday[slot]]}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3">
+            Conflict lines between your sessions:{" "}
+            {resched.edges.length === 0
+              ? "none, so any days will do."
+              : resched.edges.map(([a, b]) => `${slotLabel(Number(a))} – ${slotLabel(Number(b))}`).join(", ") + "."}{" "}
+            {resched.missed.length === 0
+              ? "Nothing has been missed, so nothing needs to move."
+              : `${resched.missed.length} missed. After rescheduling, conflicting sessions on back-to-back days: ${resched.consecutiveClashes}.`}
+            {resched.noRoom.length > 0 && ` No free day was left for ${resched.noRoom.length} of them (the pigeonhole principle).`}
+          </p>
+          <p className="mt-1 text-base text-muted">The program tries every possible arrangement and keeps the one with the fewest problems.</p>
+        </div>
       </Concept>
 
       {/* ---------------- 5. COMBINATORICS ---------------- */}

@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { EXERCISES } from "@/data/exercises";
-import { toISODate } from "@/lib/dates";
+import { toISODate, weekdayIndex } from "@/lib/dates";
 import { chooseSwap, exerciseMinutes, targetFor, usableFor } from "@/lib/planGenerator";
-import { getOverload } from "@/lib/planStore";
+import { getCurrentWeek, getOverload } from "@/lib/planStore";
+import { planReschedule } from "@/lib/reschedule";
 import { getToday } from "@/lib/today.server";
 import { getProfile } from "@/lib/profile";
 import { parseAmount, parseWeight } from "@/lib/strength";
@@ -158,4 +159,52 @@ export async function saveFeeling(formData: FormData) {
     .upsert({ user_id: user.id, week_start: plan.week_start, day, feeling }, { onConflict: "user_id,week_start,day" });
   refresh();
   revalidatePath("/maths");
+}
+
+export interface RescheduleState {
+  message?: string;
+  error?: string;
+}
+
+/**
+ * "Reschedule the rest of my week": colour the unfinished workouts onto today … Sunday
+ * (see math/sessionColouring.ts). Worked out here on the server from the saved plan.
+ */
+export async function rescheduleWeek(): Promise<RescheduleState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const profile = await getProfile(supabase);
+  if (!user || !profile) return { error: "Please log in again." };
+
+  const week = await getCurrentWeek(supabase, user.id, profile);
+  const today = weekdayIndex(await getToday());
+  const plan = planReschedule(
+    week.days.map((d) => ({
+      slot: d.slot,
+      groups: [...new Set(d.items.map((i) => i.exercise.muscleGroup as string))],
+      weekday: d.weekday,
+      started: d.items.some((i) => i.done),
+    })),
+    today,
+  );
+  if (plan.missed.length === 0) return { message: "Nothing was missed, so your plan stays as it is." };
+
+  for (const slot of plan.moved) {
+    const { error } = await supabase.from("plan_items").update({ weekday: plan.newWeekday[slot] }).eq("plan_id", week.planId).eq("day", slot);
+    if (error) {
+      console.error("[reschedule]", error.message);
+      return { error: "We could not move your workouts. (Has the Phase 13 database update been run?)" };
+    }
+  }
+  refresh();
+  revalidatePath("/maths");
+  const placed = plan.missed.length - plan.noRoom.length;
+  return {
+    message:
+      plan.noRoom.length === 0
+        ? `Done! ${placed} missed ${placed === 1 ? "workout was" : "workouts were"} moved into the rest of this week.`
+        : `We moved ${placed} missed ${placed === 1 ? "workout" : "workouts"}, but there was no free day for ${plan.noRoom.length} more. Next week starts fresh.`,
+  };
 }

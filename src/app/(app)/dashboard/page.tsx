@@ -1,10 +1,10 @@
 import Link from "next/link";
 import ExerciseCard from "@/components/ExerciseCard";
 import FeedbackCard from "@/components/FeedbackCard";
+import RescheduleCard from "@/components/RescheduleCard";
 import ButtonLink from "@/components/Button";
 import { WEEKDAYS, weekdayIndex } from "@/lib/dates";
 import { groupTitle } from "@/lib/labels";
-import { weekdayForSlot } from "@/lib/planGenerator";
 import { getCurrentWeek, getLogDates } from "@/lib/planStore";
 import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
@@ -29,12 +29,15 @@ export default async function DashboardPage() {
 
   const daysUsed = week.days.length;
   const todayWeekday = weekdayIndex(now);
-  const withWeekday = week.days.map((d) => ({ ...d, weekday: weekdayForSlot(daysUsed, d.slot) }));
+  const withWeekday = week.days;
   const today = withWeekday.find((d) => d.weekday === todayWeekday);
   const next = withWeekday.find((d) => d.weekday > todayWeekday);
+  // A workout is missed when none of it was done and its day has gone by.
+  const missed = withWeekday.filter((d) => d.weekday < todayWeekday && !d.items.some((i) => i.done));
 
   return (
     <div className="space-y-12">
+      {missed.length > 0 && <RescheduleCard missedDays={missed.map((d) => WEEKDAYS[d.weekday])} />}
       <section aria-labelledby="streak" className="grid gap-4 sm:grid-cols-2">
         <h1 id="streak" className="sr-only">Today</h1>
         <div className="rounded-2xl bg-accent-soft p-6">
@@ -104,6 +107,7 @@ export default async function DashboardPage() {
                     <p className="font-semibold">
                       {WEEKDAYS[d.weekday]}
                       {d.weekday === todayWeekday && <span className="ml-2 rounded-full bg-accent px-2 py-0.5 text-sm text-white">Today</span>}
+                      {missed.includes(d) && <span className="ml-2 rounded-full bg-amber-200 px-2 py-0.5 text-sm text-amber-950">Missed</span>}
                     </p>
                     <p className="text-base text-muted">{groupTitle(scheduleGroupsForDay(d.items))}</p>
                   </div>

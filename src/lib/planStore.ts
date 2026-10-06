@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { EXERCISES } from "../data/exercises";
 import { mondayOf, toISODate, weeksBetween } from "./dates";
 import { multipliersFromFeedback, stepSum, type Feeling } from "./math/recurrence";
-import { generatePlan } from "./planGenerator";
+import { generatePlan, weekdayForSlot } from "./planGenerator";
 import type { LoggedResult } from "./strength";
 import { getToday } from "./today.server";
 import type { Profile } from "./profile";
@@ -24,6 +24,8 @@ export interface WeekItem {
 
 export interface WeekDay {
   slot: number;
+  /** Which day of the week this workout is on (0 = Monday). Moves when a missed workout is rescheduled. */
+  weekday: number;
   items: WeekItem[];
   /** How the user said this workout felt (if they answered). */
   feeling?: Feeling;
@@ -96,12 +98,12 @@ export async function getCurrentWeek(supabase: SupabaseClient, userId: string, p
     }
   }
 
-  const { data: rows } = await supabase
-    .from("plan_items")
-    .select("id, day, position, exercise_id, sets, reps, done")
-    .eq("plan_id", plan!.id)
-    .order("day")
-    .order("position");
+  // `weekday` only exists after the Phase 13 database update; fall back quietly if it is missing.
+  const columns = "id, day, position, exercise_id, sets, reps, done";
+  const withWeekday = await supabase.from("plan_items").select(`${columns}, weekday`).eq("plan_id", plan!.id).order("day").order("position");
+  const rows: { id: string; day: number; exercise_id: string; sets: number; reps: number; done: boolean; weekday?: number | null }[] | null = withWeekday.error
+    ? (await supabase.from("plan_items").select(columns).eq("plan_id", plan!.id).order("day").order("position")).data
+    : withWeekday.data;
 
   const { data: feedback } = await supabase.from("workout_feedback").select("day, feeling").eq("week_start", weekStart);
   const feelingOf = new Map((feedback ?? []).map((f) => [f.day as number, f.feeling as Feeling]));
@@ -128,9 +130,17 @@ export async function getCurrentWeek(supabase: SupabaseClient, userId: string, p
     };
     byDay.set(r.day, [...(byDay.get(r.day) ?? []), item]);
   }
+  const weekdayOfSlot = new Map<number, number>();
+  for (const r of rows ?? []) if (r.weekday != null) weekdayOfSlot.set(r.day, r.weekday);
+  const daysUsed = byDay.size;
   const days = [...byDay.entries()]
-    .sort((a, b) => a[0] - b[0])
-    .map(([slot, items]) => ({ slot, items, feeling: feelingOf.get(slot) }));
+    .map(([slot, items]) => ({
+      slot,
+      weekday: weekdayOfSlot.get(slot) ?? weekdayForSlot(daysUsed, slot),
+      items,
+      feeling: feelingOf.get(slot),
+    }))
+    .sort((a, b) => a.weekday - b.weekday || a.slot - b.slot);
   const overload = await getOverload(supabase, weekStart);
   return { planId: plan!.id, weekStart, ...overload, days };
 }

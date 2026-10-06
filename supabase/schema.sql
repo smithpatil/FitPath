@@ -50,7 +50,10 @@ create table if not exists public.plan_items (
   sets        int  not null check (sets > 0),
   reps        int  not null check (reps > 0),       -- reps, or seconds for timed moves
   done        boolean not null default false,
-  done_at     timestamptz
+  done_at     timestamptz,
+  -- Phase 13 (also in migrations/004_plan_weekday.sql): weekday this workout is on, 0 = Monday … 6 = Sunday.
+  -- Empty = the default pattern for the number of training days. Set when a missed workout is rescheduled.
+  weekday     int check (weekday is null or weekday between 0 and 6)
 );
 
 -- ============ Logs ============

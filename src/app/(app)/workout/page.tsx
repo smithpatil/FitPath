@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { WEEKDAYS, weekdayIndex } from "@/lib/dates";
 import { describeTarget, groupTitle } from "@/lib/labels";
-import { weekdayForSlot } from "@/lib/planGenerator";
 import { getCurrentWeek } from "@/lib/planStore";
 import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
@@ -23,12 +22,11 @@ export default async function WorkoutPage({ searchParams }: { searchParams: Prom
   const week = await getCurrentWeek(supabase, user!.id, profile);
   const { day } = await searchParams;
   const todayWeekday = weekdayIndex(await getToday());
-  const n = week.days.length;
 
   // The day asked for in the link, else today's workout, else the first unfinished one.
   const chosen =
     week.days.find((d) => String(d.slot) === day) ??
-    week.days.find((d) => weekdayForSlot(n, d.slot) === todayWeekday) ??
+    week.days.find((d) => d.weekday === todayWeekday) ??
     week.days.find((d) => d.items.some((i) => !i.done));
 
   if (!chosen) {
@@ -64,7 +62,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams: Prom
       items={items}
       restSecs={restSeconds(profile.level)}
       daySlot={chosen.slot}
-      title={`${WEEKDAYS[weekdayForSlot(n, chosen.slot)]}: ${groupTitle(scheduleGroupsForDay(chosen.items))}`}
+      title={`${WEEKDAYS[chosen.weekday]}: ${groupTitle(scheduleGroupsForDay(chosen.items))}`}
       warmup={warmupFor(profile)}
       cooldown={cooldownFor(profile)}
       units={profile.units}
