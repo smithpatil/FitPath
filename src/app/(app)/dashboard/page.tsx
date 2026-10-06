@@ -64,6 +64,12 @@ export default async function DashboardPage() {
             <p className="mt-2 text-muted">
               {WEEKDAYS[todayWeekday]}: <strong className="text-ink">{groupTitle(scheduleGroupsForDay(today.items))}</strong>
             </p>
+            {today.items.some((i) => !i.done) && (
+              <div className="mt-6">
+                <ButtonLink href={`/workout?day=${today.slot}`}>Start workout mode</ButtonLink>
+                <p className="mt-2 text-base text-muted">One exercise at a time, with a rest timer. Or tick them off below.</p>
+              </div>
+            )}
             <ul className="mt-6 space-y-4">
               {today.items.map((item) => (
                 <ExerciseCard key={item.id} item={item} />

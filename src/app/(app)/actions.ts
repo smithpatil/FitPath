@@ -15,9 +15,11 @@ function refresh() {
   revalidatePath("/progress");
 }
 
-/** "Mark as done" / "Undo": flips the tick and keeps the workout log in step. */
-export async function toggleDone(formData: FormData) {
-  const itemId = String(formData.get("itemId") ?? "");
+/**
+ * Set one plan item to done / not done and keep the workout log in step.
+ * `wanted` = true/false sets it; undefined flips it.
+ */
+async function setItemDone(itemId: string, wanted?: boolean) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -28,7 +30,8 @@ export async function toggleDone(formData: FormData) {
   const { data: item } = await supabase.from("plan_items").select("id, exercise_id, done").eq("id", itemId).maybeSingle();
   if (!item) return;
 
-  const nowDone = !item.done;
+  const nowDone = wanted ?? !item.done;
+  if (nowDone === item.done) return; // already in that state: nothing to do (no duplicate logs)
   await supabase.from("plan_items").update({ done: nowDone, done_at: nowDone ? new Date().toISOString() : null }).eq("id", itemId);
   if (nowDone) {
     await supabase.from("workout_logs").insert({
@@ -41,6 +44,16 @@ export async function toggleDone(formData: FormData) {
     await supabase.from("workout_logs").delete().eq("plan_item_id", itemId);
   }
   refresh();
+}
+
+/** "Mark as done" / "Undo" buttons. */
+export async function toggleDone(formData: FormData) {
+  await setItemDone(String(formData.get("itemId") ?? ""));
+}
+
+/** Workout mode: the last set of an exercise is finished, so tick it (never un-ticks). */
+export async function markDone(itemId: string) {
+  await setItemDone(itemId, true);
 }
 
 export interface SwapState {

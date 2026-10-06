@@ -54,6 +54,13 @@ export default async function PlanPage() {
               {groupTitle(scheduleGroupsForDay(d.items))} · about {d.items.reduce((s, i) => s + i.exercise.durationMin, 0)} minutes
               (your limit is {profile.minutes} minutes for each workout day)
             </p>
+            {d.items.some((i) => !i.done) && (
+              <p className="mt-2">
+                <Link href={`/workout?day=${d.slot}`} className="font-semibold text-accent underline">
+                  Start this workout in workout mode →
+                </Link>
+              </p>
+            )}
             {d.items.reduce((s, i) => s + i.exercise.durationMin, 0) < profile.minutes * 0.7 && (
               <p className="mt-1 text-base text-muted">
                 This workout is shorter than your limit because your equipment and safety answers leave fewer moves to choose from.

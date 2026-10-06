@@ -6,7 +6,7 @@ import { getSupabaseEnv } from "./lib/supabase/env";
 // (2) sends visitors to the right place:
 //   logged out + private page  → /login
 //   logged in  + login/signup  → /dashboard
-const PRIVATE = ["/dashboard", "/plan", "/progress", "/maths", "/settings", "/onboarding", "/coach"];
+const PRIVATE = ["/dashboard", "/plan", "/progress", "/maths", "/settings", "/onboarding", "/coach", "/workout"];
 const AUTH_PAGES = ["/login", "/signup"];
 
 export async function proxy(request: NextRequest) {
@@ -38,5 +38,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/plan/:path*", "/progress/:path*", "/maths/:path*", "/settings/:path*", "/onboarding/:path*", "/coach/:path*", "/login", "/signup"],
+  matcher: ["/dashboard/:path*", "/plan/:path*", "/progress/:path*", "/maths/:path*", "/settings/:path*", "/onboarding/:path*", "/coach/:path*", "/workout/:path*", "/login", "/signup"],
 };
