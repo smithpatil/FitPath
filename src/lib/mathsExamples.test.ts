@@ -50,6 +50,24 @@ describe.each(Object.entries(profiles))("maths examples for %s", (_name, profile
   });
 });
 
+describe("adaptive overload on the maths page", () => {
+  it("defaults to every week 'just right' (m = 1), matching the fixed plan", () => {
+    const { ex } = examplesFor(profiles.home); // week index 3
+    expect(ex.recurrence.adaptive.multipliers).toEqual([1, 1, 1]);
+    expect(ex.recurrence.adaptive.steps).toBe(3);
+    expect(ex.recurrence.adaptive.sequence).toEqual(ex.recurrence.weeks.slice(0, 4).map((w) => w.closedForm));
+  });
+  it("uses the real multipliers when given", () => {
+    const p = profiles.home;
+    const plan = generatePlan(p, 2);
+    const ex = buildMathsExamples(p, plan.days.map((d) => ({ exerciseIds: d.items.map((i) => i.exerciseId) })), 3, [2, 0, 1]);
+    expect(ex.recurrence.adaptive.steps).toBe(3);
+    const { w0, d } = ex.recurrence;
+    expect(ex.recurrence.adaptive.sequence).toEqual([w0, w0 + 2 * d, w0 + 2 * d, w0 + 3 * d]);
+    expect(ex.recurrence.adaptive.proof.allAgree).toBe(true);
+  });
+});
+
 describe("specific facts", () => {
   it("a knee limit picks the knee rule", () => {
     expect(examplesFor(profiles.home).ex.logic.rule.premises).toContain("knee");

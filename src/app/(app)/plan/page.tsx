@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ExerciseCard from "@/components/ExerciseCard";
+import FeedbackCard from "@/components/FeedbackCard";
 import { WEEKDAYS } from "@/lib/dates";
 import { groupTitle } from "@/lib/labels";
 import { usableFor, weekdayForSlot } from "@/lib/planGenerator";
@@ -26,7 +27,8 @@ export default async function PlanPage() {
       <header>
         <h1 className="text-3xl font-bold">Your weekly plan</h1>
         <p className="mt-2 text-muted">
-          Week {week.weekIndex + 1} of your plan. Each week the numbers go up a little, so you keep improving.
+          Week {week.weekIndex + 1} of your plan. Each week the numbers go up a little, so you keep improving. After finishing a
+          workout day, tell us how it felt: your answers decide how fast next week&apos;s numbers rise.
         </p>
       </header>
 
@@ -62,6 +64,9 @@ export default async function PlanPage() {
                 <ExerciseCard key={item.id} item={item} />
               ))}
             </ul>
+            {d.items.length > 0 && d.items.every((i) => i.done) && (
+              <FeedbackCard planId={week.planId} day={d.slot} feeling={d.feeling} />
+            )}
           </section>
         ))
       )}

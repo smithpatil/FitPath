@@ -71,7 +71,23 @@ create table if not exists public.body_weights (
   unique (user_id, measured_on)
 );
 
+-- How each workout felt (Phase 9, adaptive overload). Same as migrations/001_workout_feedback.sql.
+create table if not exists public.workout_feedback (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  week_start  date not null,
+  day         int  not null check (day >= 0),
+  feeling     text not null check (feeling in ('easy', 'right', 'hard')),
+  created_at  timestamptz not null default now(),
+  unique (user_id, week_start, day)
+);
+
 -- ============ Row-level security: people only see their own rows ============
+alter table public.workout_feedback enable row level security;
+drop policy if exists "own feedback" on public.workout_feedback;
+create policy "own feedback" on public.workout_feedback for all
+  using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
 alter table public.exercises     enable row level security;
 alter table public.profiles      enable row level security;
 alter table public.plans         enable row level security;

@@ -38,6 +38,7 @@ export default async function MathsPage() {
     profile,
     week.days.map((d) => ({ exerciseIds: d.items.map((i) => i.exercise.id) })),
     week.weekIndex,
+    week.multipliers,
   );
   const { sets, logic, relations, graph, counting, recurrence, knapsack: knap } = ex;
 
@@ -496,6 +497,95 @@ export default async function MathsPage() {
           <p className="mt-3 text-base text-muted">
             As a double-check the program compared both methods for weeks 0 to {recurrence.proof.checkedUpTo}: they agree{" "}
             {recurrence.proof.allAgree ? "every time ✓" : "✗"}.
+          </p>
+        </div>
+
+        {/* Adaptive overload: the step changes with the user's feedback */}
+        <div className="rounded-xl bg-white p-4">
+          <p className="text-lg font-semibold">The adaptive version: your feedback changes the step</p>
+          <p className="mt-2">
+            After each finished workout day you can say it felt <strong>too easy</strong>, <strong>just right</strong> or{" "}
+            <strong>too hard</strong>. The answers of one week decide the multiplier m for the next week:
+          </p>
+          <ul className="mt-2 list-disc space-y-1 pl-6">
+            <li>mostly too easy → m = 2 (step up twice as fast)</li>
+            <li>just right, a tie, or no answer → m = 1 (normal step)</li>
+            <li>mostly too hard → m = 0 (hold: same numbers again)</li>
+          </ul>
+          <Formula>
+            Recurrence: W(n) = W(n − 1) + mₙ × d<br />
+            Closed form: W(n) = W(0) + d × S(n), where S(n) = m₁ + m₂ + … + mₙ<br />
+            Bounds: every m is 0, 1 or 2, so W(0) ≤ W(n) ≤ W(0) + 2 × n × d
+          </Formula>
+          <p className="text-base text-muted">
+            The fixed plan above is the special case where every m = 1, so S(n) = n.
+          </p>
+
+          {recurrence.adaptive.multipliers.length === 0 ? (
+            <p className="mt-3">
+              This is the first week of your plan, so there are no earlier weeks yet. Rate your workouts this week, and next week your
+              multiplier m₁ will appear here.
+            </p>
+          ) : (
+            <>
+              <div className="mt-3 overflow-x-auto">
+                <table className="w-full min-w-[420px] border-collapse text-center text-base">
+                  <thead>
+                    <tr>
+                      <th scope="col" className="border border-gray-300 px-3 py-2">Week n</th>
+                      <th scope="col" className="border border-gray-300 px-3 py-2">How the week before felt</th>
+                      <th scope="col" className="border border-gray-300 px-3 py-2">mₙ</th>
+                      <th scope="col" className="border border-gray-300 px-3 py-2">W(n)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="border border-gray-300 px-3 py-2">0</td>
+                      <td className="border border-gray-300 px-3 py-2">(start)</td>
+                      <td className="border border-gray-300 px-3 py-2">–</td>
+                      <td className="border border-gray-300 px-3 py-2 font-mono">{recurrence.adaptive.sequence[0]}</td>
+                    </tr>
+                    {recurrence.adaptive.multipliers.map((m, i) => (
+                      <tr key={i}>
+                        <td className="border border-gray-300 px-3 py-2">{i + 1}</td>
+                        <td className="border border-gray-300 px-3 py-2">
+                          {m === 2 ? "mostly too easy" : m === 0 ? "mostly too hard" : "just right / not rated"}
+                        </td>
+                        <td className="border border-gray-300 px-3 py-2 font-mono">{m}</td>
+                        <td className="border border-gray-300 px-3 py-2 font-mono">{recurrence.adaptive.sequence[i + 1]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-3">
+                S({recurrence.adaptive.multipliers.length}) = {recurrence.adaptive.multipliers.join(" + ")} ={" "}
+                <strong>{recurrence.adaptive.steps}</strong>, so W({recurrence.adaptive.multipliers.length}) = {recurrence.w0} + {recurrence.d} ×{" "}
+                {recurrence.adaptive.steps} ={" "}
+                <strong>{recurrence.w0 + recurrence.d * recurrence.adaptive.steps}</strong>. Without feedback it would have been {recurrence.w0}{" "}
+                + {recurrence.d} × {recurrence.adaptive.multipliers.length} = {recurrence.w0 + recurrence.d * recurrence.adaptive.multipliers.length}.
+              </p>
+            </>
+          )}
+
+          <p className="mt-4 font-semibold">Proof by induction (adaptive version)</p>
+          <p className="mt-1 font-mono text-base">{recurrence.adaptive.proof.claim}</p>
+          <p className="mt-2">
+            <strong>1. Base case.</strong> {recurrence.adaptive.proof.base.text} ✓
+          </p>
+          <p className="mt-2">
+            <strong>2. Inductive step.</strong> {recurrence.adaptive.proof.hypothesis}
+          </p>
+          <pre className="mt-2 overflow-x-auto rounded-xl bg-gray-100 p-3 font-mono text-sm leading-relaxed">
+            {recurrence.adaptive.proof.stepLines.join("\n")}
+          </pre>
+          <p className="mt-2">
+            <strong>3. Conclusion.</strong> {recurrence.adaptive.proof.conclusion}
+          </p>
+          <p className="mt-2 text-base text-muted">
+            Checked by the program for your {recurrence.adaptive.multipliers.length + 1} week
+            {recurrence.adaptive.multipliers.length === 0 ? "" : "s"} so far:{" "}
+            {recurrence.adaptive.proof.allAgree ? "recurrence and closed form agree ✓" : "✗"}.
           </p>
         </div>
       </Concept>

@@ -55,22 +55,25 @@ const WEEKDAY_PATTERN: Record<number, number[]> = {
 export const weekdayForSlot = (daysUsed: number, slot: number): number =>
   (WEEKDAY_PATTERN[daysUsed] ?? WEEKDAY_PATTERN[6])[slot];
 
-/** Step 5: sets and reps for an exercise in week n, using W(n) = W(0) + n·d (with a sensible cap). */
-export function targetFor(ex: Exercise, profile: Pick<Answers, "goal" | "level">, weekIndex: number) {
+/**
+ * Step 5: sets and reps after `steps` overload steps: W = W(0) + steps·d (with a sensible cap).
+ * steps = S(n) = m₁ + … + mₙ from the adaptive overload (equals n when every week felt "just right").
+ */
+export function targetFor(ex: Exercise, profile: Pick<Answers, "goal" | "level">, steps: number) {
   const sets = profile.level === "beginner" ? 2 : 3;
   if (ex.unit === "seconds") {
     const w0 = profile.level === "beginner" ? 20 : 30;
-    return { sets, reps: Math.min(overloadClosedForm(w0, 5, weekIndex), 60) };
+    return { sets, reps: Math.min(overloadClosedForm(w0, 5, steps), 60) };
   }
   const w0 = profile.goal === "lose_weight" ? 12 : profile.goal === "build_strength" ? 8 : 10;
-  return { sets, reps: Math.min(overloadClosedForm(w0, 1, weekIndex), w0 + 6) };
+  return { sets, reps: Math.min(overloadClosedForm(w0, 1, steps), w0 + 6) };
 }
 
 /** Best exercise of a group: highest benefit, then shorter, then by id (so results never wobble). */
 const bestOf = (list: Exercise[]) =>
   [...list].sort((a, b) => b.benefit - a.benefit || a.durationMin - b.durationMin || a.id.localeCompare(b.id))[0];
 
-export function generatePlan(profile: Answers, weekIndex: number, all: Exercise[] = EXERCISES): GeneratedPlan {
+export function generatePlan(profile: Answers, steps: number, all: Exercise[] = EXERCISES): GeneratedPlan {
   const usable = usableFor(profile, all);
 
   // Only muscle groups that have at least one usable exercise take part in the schedule.
@@ -111,13 +114,13 @@ export function generatePlan(profile: Answers, weekIndex: number, all: Exercise[
     return {
       slot,
       groups: dayGroups,
-      items: chosen.map((e) => ({ exerciseId: e.id, ...targetFor(e, profile, weekIndex) })),
+      items: chosen.map((e) => ({ exerciseId: e.id, ...targetFor(e, profile, steps) })),
       totalMin: chosen.reduce((s, e) => s + e.durationMin, 0),
       benefit: chosen.reduce((s, e) => s + e.benefit, 0),
     };
   });
 
-  fillSpareTime(days, usable, graph, profile, weekIndex);
+  fillSpareTime(days, usable, graph, profile, steps);
   return { days, daysUsed };
 }
 
@@ -135,7 +138,7 @@ function fillSpareTime(
   usable: Exercise[],
   graph: Graph,
   profile: Answers,
-  weekIndex: number,
+  steps: number,
 ) {
   const conflicts = (a: string, b: string) =>
     graph.edges.some(([x, y]) => (x === a && y === b) || (x === b && y === a));
@@ -166,7 +169,7 @@ function fillSpareTime(
     const all = [...day.items.map((i) => usable.find((e) => e.id === i.exerciseId)!), ...added].sort(
       (a, b) => b.benefit - a.benefit || a.id.localeCompare(b.id),
     );
-    day.items = all.map((e) => ({ exerciseId: e.id, ...targetFor(e, profile, weekIndex) }));
+    day.items = all.map((e) => ({ exerciseId: e.id, ...targetFor(e, profile, steps) }));
     day.groups = [...new Set([...day.groups, ...added.map((e) => e.muscleGroup as string)])];
     day.totalMin = all.reduce((s, e) => s + e.durationMin, 0);
     day.benefit = all.reduce((s, e) => s + e.benefit, 0);

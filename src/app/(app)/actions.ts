@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { EXERCISES } from "@/data/exercises";
 import { toISODate } from "@/lib/dates";
 import { chooseSwap, targetFor, usableFor } from "@/lib/planGenerator";
-import { getWeekIndex } from "@/lib/planStore";
+import { getOverload } from "@/lib/planStore";
 import { getToday } from "@/lib/today.server";
 import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
@@ -67,9 +67,35 @@ export async function swapExercise(_prev: SwapState, formData: FormData): Promis
   if (!replacement) return { error: "No other similar exercise fits your equipment, safety needs and time. Keep this one for now." };
 
   const { data: plan } = await supabase.from("plans").select("week_start").eq("id", item.plan_id).single();
-  const weekIndex = await getWeekIndex(supabase, plan!.week_start);
-  const { sets, reps } = targetFor(replacement, profile, weekIndex);
+  const { steps } = await getOverload(supabase, plan!.week_start);
+  const { sets, reps } = targetFor(replacement, profile, steps);
   await supabase.from("plan_items").update({ exercise_id: replacement.id, sets, reps }).eq("id", itemId);
   refresh();
   return {};
+}
+
+const FEELINGS = ["easy", "right", "hard"] as const;
+
+/** "How did this workout feel?" Saved per training day; it shapes NEXT week's numbers. */
+export async function saveFeeling(formData: FormData) {
+  const planId = String(formData.get("planId") ?? "");
+  const day = Number(formData.get("day"));
+  const feeling = String(formData.get("feeling") ?? "");
+  if (!planId || !Number.isInteger(day) || day < 0 || !FEELINGS.includes(feeling as (typeof FEELINGS)[number])) return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  // Row-level security means we only find the plan if it is the user's own.
+  const { data: plan } = await supabase.from("plans").select("week_start").eq("id", planId).maybeSingle();
+  if (!plan) return;
+
+  await supabase
+    .from("workout_feedback")
+    .upsert({ user_id: user.id, week_start: plan.week_start, day, feeling }, { onConflict: "user_id,week_start,day" });
+  refresh();
+  revalidatePath("/maths");
 }

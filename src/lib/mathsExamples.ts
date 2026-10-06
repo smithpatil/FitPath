@@ -14,7 +14,15 @@ import {
 } from "./math/graphColouring";
 import { knapsack, type KnapsackItem, type KnapsackResult } from "./math/knapsack";
 import { SAFETY_RULES, firedRules, truthTable, valuationFor, type SafetyRule, type TruthRow } from "./math/logic";
-import { inductionProof, overloadPlan, overloadRecurrence, type InductionProof } from "./math/recurrence";
+import {
+  adaptiveInductionProof,
+  adaptiveSequence,
+  inductionProof,
+  overloadPlan,
+  overloadRecurrence,
+  stepSum,
+  type InductionProof,
+} from "./math/recurrence";
 import {
   buildOrder,
   checkEquivalence,
@@ -90,6 +98,14 @@ export interface MathsExamples {
     currentWeek: number;
     currentValue: number;
     cap: number;
+    /** Adaptive overload from the user's feedback. */
+    adaptive: {
+      multipliers: number[];
+      steps: number;
+      /** W(0)..W(n) following the adaptive recurrence (before the safety cap). */
+      sequence: number[];
+      proof: InductionProof;
+    };
     proof: InductionProof;
   };
   knapsack: {
@@ -101,7 +117,13 @@ export interface MathsExamples {
   } | null;
 }
 
-export function buildMathsExamples(profile: Answers, planDays: PlanDayInput[], weekIndex: number): MathsExamples {
+export function buildMathsExamples(
+  profile: Answers,
+  planDays: PlanDayInput[],
+  weekIndex: number,
+  /** m₁..mₙ from feedback; defaults to all 1s (every week "just right"). */
+  multipliers: number[] = Array(weekIndex).fill(1),
+): MathsExamples {
   const usable = usableFor(profile);
   const usableIds = new Set(usable.map((e) => e.id));
   const doable = doableExercises(EXERCISES, profile.equipment);
@@ -244,9 +266,15 @@ export function buildMathsExamples(profile: Answers, planDays: PlanDayInput[], w
       d,
       weeks,
       currentWeek: weekIndex,
-      currentValue: Math.min(w0 + weekIndex * d, cap),
+      currentValue: Math.min(w0 + stepSum(multipliers) * d, cap),
       cap,
       proof: inductionProof(w0, d),
+      adaptive: {
+        multipliers,
+        steps: stepSum(multipliers),
+        sequence: adaptiveSequence(w0, d, multipliers),
+        proof: adaptiveInductionProof(w0, d, multipliers),
+      },
     },
     knapsack: knap,
   };

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ExerciseCard from "@/components/ExerciseCard";
+import FeedbackCard from "@/components/FeedbackCard";
 import ButtonLink from "@/components/Button";
 import { WEEKDAYS, weekdayIndex } from "@/lib/dates";
 import { groupTitle } from "@/lib/labels";
@@ -68,6 +69,9 @@ export default async function DashboardPage() {
                 <ExerciseCard key={item.id} item={item} />
               ))}
             </ul>
+            {today.items.length > 0 && today.items.every((i) => i.done) && (
+              <FeedbackCard planId={week.planId} day={today.slot} feeling={today.feeling} />
+            )}
           </>
         ) : (
           <div className="mt-4 rounded-2xl border-2 border-gray-200 p-6">
