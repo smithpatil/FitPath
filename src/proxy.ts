@@ -5,9 +5,8 @@ import { getSupabaseEnv } from "./lib/supabase/env";
 // Runs before every page in `matcher`. It (1) keeps the login session fresh and
 // (2) sends visitors to the right place:
 //   logged out + private page  → /login
-//   logged in  + login/signup  → /dashboard
+//   (login and signup pages show a "you are already logged in" choice instead of redirecting)
 const PRIVATE = ["/dashboard", "/plan", "/progress", "/maths", "/settings", "/onboarding", "/coach", "/workout"];
-const AUTH_PAGES = ["/login", "/signup"];
 
 export async function proxy(request: NextRequest) {
   const { url, anonKey } = getSupabaseEnv();
@@ -33,7 +32,6 @@ export async function proxy(request: NextRequest) {
   const goTo = (to: string) => NextResponse.redirect(new URL(to, request.url));
 
   if (!user && PRIVATE.some((p) => path === p || path.startsWith(p + "/"))) return goTo("/login");
-  if (user && AUTH_PAGES.includes(path)) return goTo("/dashboard");
   return response;
 }
 

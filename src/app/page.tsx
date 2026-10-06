@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ButtonLink from "@/components/Button";
+import { getUserEmail } from "@/lib/supabase/user";
 
 const benefits = [
   { title: "Made for you", text: "Your plan fits your goal, your time and the equipment you have." },
@@ -13,14 +14,21 @@ const steps = [
   { title: "Do it and tick it off", text: "Follow each day's workout and mark it done." },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const loggedIn = (await getUserEmail()) !== null;
   return (
     <>
       <header className="mx-auto flex w-full max-w-4xl items-center justify-between px-4 py-4">
         <span className="text-xl font-bold text-accent">FitPath</span>
-        <Link href="/login" className="rounded-full px-4 py-2 font-medium hover:bg-accent-soft">
-          Log in
-        </Link>
+        {loggedIn ? (
+          <Link href="/dashboard" className="rounded-full px-4 py-2 font-medium hover:bg-accent-soft">
+            My workouts
+          </Link>
+        ) : (
+          <Link href="/login" className="rounded-full px-4 py-2 font-medium hover:bg-accent-soft">
+            Log in
+          </Link>
+        )}
       </header>
 
       <main id="main" tabIndex={-1} className="mx-auto w-full max-w-4xl flex-1 px-4 outline-none">
@@ -32,7 +40,7 @@ export default function Home() {
             Answer a few questions and get a weekly workout plan made just for you. No experience needed.
           </p>
           <div className="mt-10">
-            <ButtonLink href="/signup">Get started</ButtonLink>
+            <ButtonLink href={loggedIn ? "/dashboard" : "/signup"}>{loggedIn ? "Go to my workouts" : "Get started"}</ButtonLink>
           </div>
         </section>
 
@@ -65,7 +73,7 @@ export default function Home() {
             ))}
           </ol>
           <div className="mt-12 text-center">
-            <ButtonLink href="/signup">Get started</ButtonLink>
+            <ButtonLink href={loggedIn ? "/dashboard" : "/signup"}>{loggedIn ? "Go to my workouts" : "Get started"}</ButtonLink>
           </div>
         </section>
       </main>
