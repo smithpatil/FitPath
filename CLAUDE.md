@@ -15,7 +15,7 @@ AI Coach: the user first dropped it, then re-added it using the FREE **Groq** AP
 - The AI only explains/motivates; the maths chooses exercises. Safety is enforced in our code too (`src/lib/coach/safety.ts`): doctor/physio note on pain/injury/condition, diet note on extreme-diet talk, browser can never send a "system" role, rate limit 8/min/user.
 
 ## Pages (MVP)
-Landing · Sign up/Log in · Onboarding (one question per screen + progress bar) · Dashboard · Workout plan (Mark as done, Swap exercise) · Progress · Settings (profile, kg/lb, delete account).
+NO landing page: the website's home (`/`) IS the login form (logged-in visitors see an "already logged in" choice) · Sign up/Log in · Onboarding (one question per screen + progress bar) · Dashboard · Workout plan (Mark as done, Swap exercise) · Progress · Settings (profile, kg/lb, delete account).
 Navbar: Today, Plan, Progress, Settings.
 
 ## Maths requirement (core)

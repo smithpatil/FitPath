@@ -13,7 +13,7 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
   return (
     <main id="main" tabIndex={-1} className="grid min-h-screen flex-1 outline-none lg:grid-cols-2">
       {/* Illustrated panel (desktop) */}
-      <aside className="on-deep relative hidden overflow-hidden bg-gradient-to-br from-deep via-[#064e4a] to-accent p-12 text-white lg:flex lg:flex-col lg:justify-between">
+      <aside className="on-deep relative hidden overflow-hidden bg-gradient-to-br from-deep via-[#064e4a] to-accent p-12 text-white lg:flex lg:flex-col lg:justify-between lg:gap-10">
         <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 -left-20 h-80 w-80 rounded-full bg-spark/10 blur-3xl" />
         <Logo light className="relative" />
         <div className="relative">

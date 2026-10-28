@@ -22,7 +22,7 @@ export default function Navbar() {
       {/* Top bar: logo, plus the links on larger screens */}
       <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <Logo />
+          <Logo href="/dashboard" />
           <nav aria-label="Main" className="hidden sm:block">
             <ul className="flex gap-1">
               {links.map((l) => (

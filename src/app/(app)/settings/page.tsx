@@ -106,8 +106,8 @@ export default async function SettingsPage() {
       </section>
 
       <p className="text-base text-muted">
-        <Link href="/" className="underline">
-          Back to home page
+        <Link href="/dashboard" className="underline">
+          Back to Today
         </Link>
       </p>
     </div>

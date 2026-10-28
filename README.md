@@ -30,7 +30,7 @@ src/lib/math/       The 7 maths concepts (pure functions + tests)
 src/lib/planGenerator.ts   Wires the maths together into a weekly plan
 src/lib/coach/      Coach safety rules, prompt and rate limit
 src/data/exercises.ts      The 74 exercises (home + gym + cardio): the single source of truth
-src/app/            Pages (landing, login, onboarding, dashboard, plan, progress, maths, coach, settings)
+src/app/            Pages (login is the home page, onboarding, dashboard, plan, progress, maths, coach, settings)
 supabase/           schema.sql and seed.sql
 ```
 

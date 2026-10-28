@@ -12,9 +12,6 @@ export default function NotFound() {
       <p className="mt-3 text-muted">The link may be old or mistyped. Let&apos;s get you back on track.</p>
       <div className="mt-8 flex flex-wrap justify-center gap-4">
         <ButtonLink href="/dashboard">Go to today&apos;s workout</ButtonLink>
-        <ButtonLink href="/" variant="outline">
-          Home page
-        </ButtonLink>
       </div>
     </main>
   );
