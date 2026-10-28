@@ -7,7 +7,7 @@ const STYLES: Record<Variant, string> = {
   primary: "bg-accent text-white hover:bg-accent-dark shadow-sm",
   outline: "border-2 border-accent text-deep hover:bg-accent-soft",
   light: "bg-white text-deep hover:bg-ice shadow-sm", // for deep panels
-  spark: "bg-spark text-deep hover:bg-teal-400 shadow-sm", // the energetic main button on deep panels
+  spark: "bg-spark text-deep hover:bg-amber-400 shadow-sm", // the energetic main button on deep panels
 };
 
 // Big, rounded link-styled button. `arrow` adds a small arrow icon.

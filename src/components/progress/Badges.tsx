@@ -14,7 +14,7 @@ export default function Badges({
   const earned = badges.filter((b) => b.earned).length;
   return (
     <div className="space-y-6">
-      <div className="on-deep rounded-card bg-gradient-to-br from-deep via-[#064e4a] to-accent p-5 text-white sm:p-6">
+      <div className="on-deep rounded-card bg-gradient-to-br from-deep via-[#163027] to-accent p-5 text-white sm:p-6">
         <p className="text-sm font-extrabold uppercase tracking-widest text-ice">Next milestone</p>
         {next ? (
           <>
@@ -49,12 +49,12 @@ export default function Badges({
             <li
               key={b.id}
               className={`flex flex-col items-center gap-2 rounded-card p-4 text-center ${
-                b.earned ? "bg-white shadow-card ring-1 ring-teal-200" : "border border-dashed border-gray-300 bg-gray-50"
+                b.earned ? "bg-white shadow-card ring-1 ring-amber-200" : "border border-dashed border-gray-300 bg-gray-50"
               }`}
             >
               <span
                 className={`flex h-14 w-14 items-center justify-center rounded-full ${
-                  b.earned ? "bg-gradient-to-br from-spark to-teal-500 text-deep shadow-sm" : "bg-gray-200 text-gray-500"
+                  b.earned ? "bg-gradient-to-br from-spark to-amber-500 text-deep shadow-sm" : "bg-gray-200 text-gray-500"
                 }`}
               >
                 <Icon name={b.icon} className="h-7 w-7" />

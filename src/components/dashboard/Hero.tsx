@@ -18,7 +18,7 @@ export default function Hero(props: HeroProps) {
   return (
     <section
       aria-labelledby="hero-title"
-      className="on-deep relative overflow-hidden rounded-hero bg-gradient-to-br from-deep via-[#064e4a] to-accent text-white"
+      className="on-deep relative overflow-hidden rounded-hero bg-gradient-to-br from-deep via-[#163027] to-accent text-white"
     >
       <Image src={PHOTOS[props.format].src} alt="" fill priority sizes="(min-width: 1024px) 1000px, 100vw" className={`object-cover ${FOCUS[props.format]}`} />
       <div aria-hidden="true" className="absolute inset-0 max-md:bg-deep/80 md:bg-gradient-to-r md:from-deep md:from-30% md:via-deep/65 md:via-50% md:to-transparent" />

@@ -5,9 +5,9 @@ import { PHOTOS } from "@/lib/photos";
 
 // The colour wash for the setup banner. The text always sits on a dark background, so contrast is safe.
 export const WASH: Record<Format, string> = {
-  gym: "from-accent via-[#115e59] to-deep",
-  strength: "from-[#115e59] via-[#0a4642] to-deep",
-  yoga: "from-[#0f766e] via-[#064e4a] to-deep",
+  gym: "from-accent via-[#214d3f] to-deep",
+  strength: "from-[#6b7a45] via-[#454f2c] to-deep",
+  yoga: "from-[#5b4b8a] via-[#3a3057] to-deep",
 };
 
 // One workout-style card: a photo, three benefits, the title, how long, a short description and a button.

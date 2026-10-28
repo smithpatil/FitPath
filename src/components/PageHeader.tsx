@@ -13,7 +13,7 @@ export default function PageHeader({
   children?: React.ReactNode;
 }) {
   return (
-    <header className="on-deep relative overflow-hidden rounded-hero bg-gradient-to-br from-deep via-[#064e4a] to-accent p-6 text-white sm:p-10">
+    <header className="on-deep relative overflow-hidden rounded-hero bg-gradient-to-br from-deep via-[#163027] to-accent p-6 text-white sm:p-10">
       <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-spark/15 blur-3xl" />
       <div className="relative flex items-start gap-4 sm:gap-6">
         <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-spark text-deep sm:h-16 sm:w-16">
