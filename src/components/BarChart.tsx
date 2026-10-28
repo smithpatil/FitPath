@@ -45,16 +45,16 @@ export default function BarChart({ data }: { data: WeekCount[] }) {
           const x = left + i * step + (step - barW) / 2;
           return (
             <g key={d.weekStart}>
-              <rect x={x} y={top + plotH - h} width={barW} height={h} rx="4" fill="#1d4ed8" />
+              <rect x={x} y={top + plotH - h} width={barW} height={h} rx="4" fill="#3d5a80" />
               {d.count > 0 && (
-                <text x={x + barW / 2} y={top + plotH - h - 4} textAnchor="middle" fontSize="11" fontWeight="600" fill="#1e3a8a">
+                <text x={x + barW / 2} y={top + plotH - h - 4} textAnchor="middle" fontSize="11" fontWeight="600" fill="#293f5c">
                   {d.count}
                 </text>
               )}
-              <text x={x + barW / 2} y={H - 16} textAnchor="middle" fontSize="10" fontWeight={isThisWeek ? 700 : 400} fill={isThisWeek ? "#1e3a8a" : "#4b5563"}>
+              <text x={x + barW / 2} y={H - 16} textAnchor="middle" fontSize="10" fontWeight={isThisWeek ? 700 : 400} fill={isThisWeek ? "#293f5c" : "#4b5563"}>
                 {isThisWeek ? "This" : d.label.split(" ")[0]}
               </text>
-              <text x={x + barW / 2} y={H - 4} textAnchor="middle" fontSize="9" fontWeight={isThisWeek ? 700 : 400} fill={isThisWeek ? "#1e3a8a" : "#4b5563"}>
+              <text x={x + barW / 2} y={H - 4} textAnchor="middle" fontSize="9" fontWeight={isThisWeek ? 700 : 400} fill={isThisWeek ? "#293f5c" : "#4b5563"}>
                 {isThisWeek ? "week" : d.label.split(" ")[1]}
               </text>
             </g>
