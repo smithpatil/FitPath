@@ -48,12 +48,12 @@ Exercise selection and scheduling come ONLY from these functions.
 - Short disclaimer on the onboarding screens.
 
 ## Design rules
-Light, energetic "fitness website" look (visual refresh on top of the original teal): big illustrated hero panels, icon cards, short copy, strong headings.
-Tokens live in `src/app/globals.css`: `accent` teal #0f766e (buttons, links) · `accent-dark` · `accent-soft` mint panels · `deep` near-black teal (hero/banner gradients, with white text) · `ice` light mint text on deep · `spark` amber (the one "pop" colour: flames, badges, main button on deep panels) · `ink` / `muted` text.
+Light, energetic "fitness website" look (navy + orange palette over real photos): big illustrated hero panels, icon cards, short copy, strong headings.
+Tokens live in `src/app/globals.css`: `accent` orange #c2410c (buttons, links) · `accent-dark` · `accent-soft` peach panels · `deep` near-black navy #0f172a (hero/banner gradients, with white text) · `ice` light slate text on deep · `spark` amber #fbbf24 (the one "pop" colour: flames, badges, main button on deep panels) · `ink` / `muted` text.
 Use semantic tokens, never raw hex. NEVER name a colour token `base` (collides with Tailwind's `text-base`).
 Shared pieces: `Icon` (own SVG icon set, no library), `Logo`, `Button` (primary/outline/light/spark), `PageHeader`, `dashboard/*` (Hero, TodaySteps = "what to do today", Stats, WeekStrip, QuickLinks), `plan/DayHeader`, `landing/SampleWeek`.
 Phones get a bottom tab bar (Navbar); the coach button sits above it. Navbar has 4 items. Mobile-first, big buttons, no hidden menus, no popups, no autoplay video. Gentle floating animation only, disabled for reduced-motion.
-Accessibility: WCAG 2.2 AA; focus ring teal (amber on deep panels via `.on-deep`); contrast audited by script (0 failures on landing and login).
+Accessibility: WCAG 2.2 AA; focus ring orange (amber on deep panels via `.on-deep`); contrast audited by script (0 failures on landing and login).
 Plain language for beginners; explain terms (e.g. "reps" = how many times you do a movement).
 
 ## Working style

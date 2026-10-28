@@ -30,7 +30,7 @@ export default function Stats({ streak, daysDone, daysPlanned }: { streak: numbe
               cy="40"
               r={R}
               fill="none"
-              stroke="#0f766e"
+              stroke="#c2410c"
               strokeWidth="9"
               strokeLinecap="round"
               strokeDasharray={C}

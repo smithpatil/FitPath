@@ -40,9 +40,9 @@ export default function LineChart({ points, unit }: { points: Point[]; unit: str
             </text>
           </g>
         ))}
-        {points.length > 1 && <polyline points={line} fill="none" stroke="#0f766e" strokeWidth="3" strokeLinejoin="round" />}
+        {points.length > 1 && <polyline points={line} fill="none" stroke="#c2410c" strokeWidth="3" strokeLinejoin="round" />}
         {points.map((p, i) => (
-          <circle key={p.date} cx={x(i)} cy={y(p.value)} r="4.5" fill="#0f766e" />
+          <circle key={p.date} cx={x(i)} cy={y(p.value)} r="4.5" fill="#c2410c" />
         ))}
         <text x={x(0)} y={H - 8} textAnchor="middle" fontSize="10" fill="#4b5563">
           {fmt(points[0].date)}
