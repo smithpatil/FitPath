@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import FormatArt from "@/components/formats/FormatArt";
 import FormatCard, { WASH } from "@/components/formats/FormatCard";
 import Icon from "@/components/Icon";
 import PageHeader from "@/components/PageHeader";
@@ -129,7 +128,6 @@ export default function FormatPicker({ saved }: { saved: Profile | null }) {
             </h1>
             <p className="mt-3 max-w-md text-lg text-ice">{info.description}</p>
           </div>
-          <FormatArt format={format} className="hidden h-40 w-56 sm:block" />
         </div>
       </div>
 

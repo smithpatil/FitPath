@@ -15,10 +15,10 @@ AI Coach: the user first dropped it, then re-added it using the FREE **Groq** AP
 - The AI only explains/motivates; the maths chooses exercises. Safety is enforced in our code too (`src/lib/coach/safety.ts`): doctor/physio note on pain/injury/condition, diet note on extreme-diet talk, browser can never send a "system" role, rate limit 8/min/user.
 
 ## Workout styles (replaced the question-by-question onboarding)
-After login a new user sees **three illustrated cards: Gym, Strength, Yoga** (`src/app/onboarding/FormatPicker.tsx`, cards in `src/components/formats/`). Choosing a card opens ONE setup screen with that style's options: Gym = "A gym" or "Home gym" (dumbbells / bands / pull-up bar), Strength = what equipment you own (none needed), Yoga = no equipment; all have goal, days (2-6), minutes (15-60), experience and optional sore areas.
+After login a new user sees **three photo cards: Gym, Strength, Yoga** (`src/app/onboarding/FormatPicker.tsx`, cards in `src/components/formats/`). Choosing a card opens ONE setup screen with that style's options: Gym = "A gym" or "Home gym" (dumbbells / bands / pull-up bar), Strength = what equipment you own (none needed), Yoga = no equipment; all have goal, days (2-6), minutes (15-60), experience and optional sore areas.
 - Saved as `profiles.format` ('gym' | 'strength' | 'yoga'; migration `005_workout_style.sql`). Old profiles without it: gym if equipment includes "gym", else strength (`src/lib/formats.ts`).
 - Exercise libraries: Gym and Strength use the 74 strength/cardio exercises; **Yoga uses only the 26 poses** (`style: "yoga"` in `src/data/exercises.ts`, held in seconds, flows in minutes). Strength never uses gym-only equipment. Total 100 exercises; after changing them run `npm run seed:gen` and run the new `supabase/seed.sql` in Supabase.
-- Wording follows the style: yoga says "poses", "Start session", "Hold 30 seconds" and names days like "Flow for shoulders, spine and arms" (`dayFocus`, `groupLabel`, `itemWord` in `src/lib/labels.ts`); the home hero shows the style name and a matching picture (`FormatArt`).
+- Wording follows the style: yoga says "poses", "Start session", "Hold 30 seconds" and names days like "Flow for shoulders, spine and arms" (`dayFocus`, `groupLabel`, `itemWord` in `src/lib/labels.ts`); the home hero shows the style name and a real photo (`src/lib/photos.ts`, files in `public/images/`, credited in Settings; photos only on the three style cards and the home hero, never on exercise cards).
 - Yoga plans have no muscle-group conflicts in the graph (gentle, so groups can share a day) and hold times start at 30 s (45 s if experienced), +5 s per step, max 90 s.
 
 ## Progress page
@@ -51,7 +51,7 @@ Exercise selection and scheduling come ONLY from these functions.
 Light, energetic "fitness website" look (visual refresh on top of the original teal): big illustrated hero panels, icon cards, short copy, strong headings.
 Tokens live in `src/app/globals.css`: `accent` teal #0f766e (buttons, links) · `accent-dark` · `accent-soft` mint panels · `deep` near-black teal (hero/banner gradients, with white text) · `ice` light mint text on deep · `spark` amber (the one "pop" colour: flames, badges, main button on deep panels) · `ink` / `muted` text.
 Use semantic tokens, never raw hex. NEVER name a colour token `base` (collides with Tailwind's `text-base`).
-Shared pieces: `Icon` (own SVG icon set, no library), `art/AthleteArt` (hero illustration), `Logo`, `Button` (primary/outline/light/spark), `PageHeader`, `dashboard/*` (Hero, TodaySteps = "what to do today", Stats, WeekStrip, QuickLinks), `plan/DayHeader`, `landing/SampleWeek`.
+Shared pieces: `Icon` (own SVG icon set, no library), `Logo`, `Button` (primary/outline/light/spark), `PageHeader`, `dashboard/*` (Hero, TodaySteps = "what to do today", Stats, WeekStrip, QuickLinks), `plan/DayHeader`, `landing/SampleWeek`.
 Phones get a bottom tab bar (Navbar); the coach button sits above it. Navbar has 4 items. Mobile-first, big buttons, no hidden menus, no popups, no autoplay video. Gentle floating animation only, disabled for reduced-motion.
 Accessibility: WCAG 2.2 AA; focus ring teal (amber on deep panels via `.on-deep`); contrast audited by script (0 failures on landing and login).
 Plain language for beginners; explain terms (e.g. "reps" = how many times you do a movement).

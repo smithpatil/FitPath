@@ -1,22 +1,24 @@
+import Image from "next/image";
 import Icon from "@/components/Icon";
 import { FORMAT_INFO, type Format } from "@/lib/formats";
-import FormatArt from "./FormatArt";
+import { PHOTOS } from "@/lib/photos";
 
-// The colour wash behind each illustration. The text always sits on the dark body, so contrast is safe.
+// The colour wash for the setup banner. The text always sits on a dark background, so contrast is safe.
 export const WASH: Record<Format, string> = {
   gym: "from-accent via-[#0b5d57] to-deep",
   strength: "from-[#a34a0a] via-[#7c3f06] to-deep",
   yoga: "from-[#6d28d9] via-[#3b1d78] to-deep",
 };
 
-// One workout-style card: a picture, three benefits, the title, how long, a short description and a button.
+// One workout-style card: a photo, three benefits, the title, how long, a short description and a button.
 // The whole card is clickable (the button stretches over it) and works with the keyboard.
 export default function FormatCard({ format, current, onChoose }: { format: Format; current?: boolean; onChoose: () => void }) {
   const info = FORMAT_INFO[format];
   return (
     <article className="on-deep group relative flex flex-col overflow-hidden rounded-hero bg-deep text-white shadow-lift ring-1 ring-black/5 transition-transform hover:-translate-y-1">
-      <div className={`relative h-60 bg-gradient-to-b ${WASH[format]} sm:h-64`}>
-        <FormatArt format={format} className="absolute inset-0 h-full w-full" />
+      <div className="relative h-60 bg-deep sm:h-64">
+        <Image src={PHOTOS[format].src} alt="" fill sizes="(min-width: 1024px) 380px, 100vw" className="object-cover" />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-deep via-deep/20 to-transparent" />
         {current && (
           <span className="absolute left-4 top-4 rounded-full bg-spark px-3 py-1 text-sm font-extrabold text-deep">Your current style</span>
         )}

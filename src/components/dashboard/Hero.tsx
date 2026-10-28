@@ -1,23 +1,28 @@
 import ButtonLink from "@/components/Button";
-import FormatArt from "@/components/formats/FormatArt";
+import Image from "next/image";
 import Icon from "@/components/Icon";
 import { FORMAT_INFO, type Format } from "@/lib/formats";
 import { itemWord } from "@/lib/labels";
+import { PHOTOS } from "@/lib/photos";
 
 export type HeroProps =
   | { kind: "workout"; format: Format; weekday: string; focus: string; exerciseCount: number; minutes: number; doneCount: number; startHref: string | null }
   | { kind: "rest"; format: Format; weekday: string; next: string }
   | { kind: "empty"; format: Format };
 
-// The big illustrated panel at the top of the home page: what to do today.
+// Where each photo is cropped so the person stays in view.
+const FOCUS: Record<Format, string> = { gym: "object-[center_20%]", strength: "object-[center_25%]", yoga: "object-[center_55%]" };
+
+// The big photo panel at the top of the home page: what to do today.
 export default function Hero(props: HeroProps) {
   return (
     <section
       aria-labelledby="hero-title"
       className="on-deep relative overflow-hidden rounded-hero bg-gradient-to-br from-deep via-[#064e4a] to-accent text-white"
     >
-      <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-spark/10 blur-3xl" />
-      <div className="relative grid items-center gap-6 p-6 sm:p-10 md:grid-cols-[1.3fr_0.7fr]">
+      <Image src={PHOTOS[props.format].src} alt="" fill priority sizes="(min-width: 1024px) 1000px, 100vw" className={`object-cover ${FOCUS[props.format]}`} />
+      <div aria-hidden="true" className="absolute inset-0 max-md:bg-deep/80 md:bg-gradient-to-r md:from-deep md:from-30% md:via-deep/65 md:via-50% md:to-transparent" />
+      <div className="relative grid items-center gap-6 p-6 sm:p-10 md:min-h-[22rem] md:grid-cols-[1.3fr_0.7fr]">
         <div>
           {props.kind === "workout" && (
             <>
@@ -76,9 +81,6 @@ export default function Hero(props: HeroProps) {
               </div>
             </>
           )}
-        </div>
-        <div aria-hidden="true" className="hidden md:block">
-          <FormatArt format={props.format} className="mx-auto w-full max-w-[300px]" />
         </div>
       </div>
     </section>

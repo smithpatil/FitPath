@@ -4,6 +4,7 @@ import ButtonLink from "@/components/Button";
 import { logout } from "@/app/(auth)/actions";
 import { FORMAT_INFO, formatOf } from "@/lib/formats";
 import { EQUIPMENT, GOALS, LEVELS, LIMITATIONS } from "@/lib/onboarding";
+import { PHOTOS } from "@/lib/photos";
 import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 import DeleteAccountForm from "./DeleteAccountForm";
@@ -106,6 +107,19 @@ export default async function SettingsPage() {
         </p>
         <DeleteAccountForm />
       </section>
+
+      <p className="text-base text-muted">
+        Photos from Unsplash by{" "}
+        {Object.values(PHOTOS).map((ph, i) => (
+          <span key={ph.src}>
+            {i > 0 && ", "}
+            <a href={ph.page} className="underline" target="_blank" rel="noreferrer">
+              {ph.photographer}
+            </a>
+          </span>
+        ))}
+        .
+      </p>
 
       <p className="text-base text-muted">
         <Link href="/dashboard" className="underline">
