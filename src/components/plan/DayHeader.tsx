@@ -30,7 +30,7 @@ export default function DayHeader({
   note?: string;
 }) {
   return (
-    <div className="on-deep relative overflow-hidden rounded-card bg-gradient-to-br from-deep via-[#431407] to-accent p-5 text-white sm:p-6">
+    <div className="on-deep relative overflow-hidden rounded-card bg-gradient-to-br from-deep via-[#172554] to-accent p-5 text-white sm:p-6">
       <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-spark/15 blur-3xl" />
       <div className="relative flex flex-wrap items-center justify-between gap-4">
         <div>

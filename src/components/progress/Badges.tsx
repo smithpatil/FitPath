@@ -14,7 +14,7 @@ export default function Badges({
   const earned = badges.filter((b) => b.earned).length;
   return (
     <div className="space-y-6">
-      <div className="on-deep rounded-card bg-gradient-to-br from-deep via-[#431407] to-accent p-5 text-white sm:p-6">
+      <div className="on-deep rounded-card bg-gradient-to-br from-deep via-[#172554] to-accent p-5 text-white sm:p-6">
         <p className="text-sm font-extrabold uppercase tracking-widest text-ice">Next milestone</p>
         {next ? (
           <>

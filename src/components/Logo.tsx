@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Icon from "./Icon";
 
-// Logo: an orange badge with a dumbbell, and the "FitPath" wordmark. `light` is for deep panels.
+// Logo: a blue badge with a dumbbell, and the "FitPath" wordmark. `light` is for deep panels.
 export default function Logo({ light = false, className = "", href = "/" }: { light?: boolean; className?: string; href?: string }) {
   return (
     <Link href={href} aria-label="FitPath home" className={`inline-flex items-center gap-2.5 ${className}`}>
