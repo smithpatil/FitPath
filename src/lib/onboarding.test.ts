@@ -26,6 +26,27 @@ describe("validateAnswers", () => {
     const r = validateAnswers({ ...good, equipment: ["dumbbells", "gym", "resistance_band"] });
     expect(r.ok && r.data.equipment).toEqual(["gym"]);
   });
+  it("keeps the chosen style and cleans the equipment to suit it", () => {
+    const yoga = validateAnswers({ ...good, format: "yoga", equipment: ["dumbbells"] });
+    expect(yoga.ok && yoga.data.format).toBe("yoga");
+    expect(yoga.ok && yoga.data.equipment).toEqual([]);
+
+    const home = validateAnswers({ ...good, format: "gym", equipment: ["dumbbells", "pull_up_bar"] });
+    expect(home.ok && home.data.format).toBe("gym");
+    expect(home.ok && home.data.equipment).toEqual(["dumbbells", "pull_up_bar"]);
+
+    const strength = validateAnswers({ ...good, format: "strength", equipment: ["gym", "dumbbells"] });
+    expect(strength.ok && strength.data.equipment).toEqual(["dumbbells"]);
+  });
+  it("works out the style from the equipment when none is sent", () => {
+    const r = validateAnswers({ ...good, equipment: ["gym"] });
+    expect(r.ok && r.data.format).toBe("gym");
+    const s = validateAnswers({ ...good, equipment: [] });
+    expect(s.ok && s.data.format).toBe("strength");
+  });
+  it("rejects an unknown style", () => {
+    expect(validateAnswers({ ...good, format: "crossfit" }).ok).toBe(false);
+  });
   it.each([
     ["goal", { goal: "become_a_wizard" }],
     ["level", { level: "expert" }],

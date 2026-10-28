@@ -3,9 +3,24 @@ import { EXERCISES } from "./exercises";
 import { MUSCLE_GROUPS } from "../lib/math/graphColouring";
 
 describe("exercise database", () => {
-  it("has 74 exercises (40 home + 25 gym + 9 cardio) with unique ids", () => {
-    expect(EXERCISES).toHaveLength(74);
-    expect(new Set(EXERCISES.map((e) => e.id)).size).toBe(74);
+  it("has 100 exercises with unique ids: 74 strength and cardio (40 home + 25 gym + 9 cardio) plus 26 yoga poses", () => {
+    expect(EXERCISES).toHaveLength(100);
+    expect(new Set(EXERCISES.map((e) => e.id)).size).toBe(100);
+    expect(EXERCISES.filter((e) => e.style !== "yoga")).toHaveLength(74);
+    expect(EXERCISES.filter((e) => e.style === "yoga")).toHaveLength(26);
+  });
+  it("yoga poses are gentle, need no equipment, and are held or flowed (never counted as reps)", () => {
+    for (const e of EXERCISES.filter((x) => x.style === "yoga")) {
+      expect(e.equipment).toEqual(["bodyweight"]);
+      expect(e.impact).toBe("low");
+      expect(["seconds", "minutes"]).toContain(e.unit);
+      expect(e.difficulty).toBeLessThan(3);
+    }
+  });
+  it("yoga progressions only build on other yoga poses", () => {
+    const byId = new Map(EXERCISES.map((e) => [e.id, e]));
+    for (const e of EXERCISES.filter((x) => x.style === "yoga"))
+      for (const easier of e.easierIds) expect(byId.get(easier)!.style).toBe("yoga");
   });
   it("every progression link points to a real exercise", () => {
     const ids = new Set(EXERCISES.map((e) => e.id));

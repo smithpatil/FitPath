@@ -2,6 +2,7 @@ import Link from "next/link";
 import PageHeader from "@/components/PageHeader";
 import ButtonLink from "@/components/Button";
 import { logout } from "@/app/(auth)/actions";
+import { FORMAT_INFO, formatOf } from "@/lib/formats";
 import { EQUIPMENT, GOALS, LEVELS, LIMITATIONS } from "@/lib/onboarding";
 import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
@@ -20,6 +21,7 @@ export default async function SettingsPage() {
   const p = (await getProfile(supabase))!;
 
   const rows: [string, string][] = [
+    ["Workout style", FORMAT_INFO[formatOf(p)].title],
     ["Goal", labelOf(GOALS, p.goal)],
     ["Experience", labelOf(LEVELS, p.level)],
     ["Training days per week", String(p.days)],
@@ -51,7 +53,7 @@ export default async function SettingsPage() {
         </p>
         <div className="mt-4">
           <ButtonLink href="/onboarding" variant="outline">
-            Edit my answers
+            Change my workout
           </ButtonLink>
         </div>
       </section>

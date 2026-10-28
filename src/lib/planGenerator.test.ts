@@ -203,3 +203,68 @@ describe("weekdays", () => {
     expect([0, 1].map((s) => weekdayForSlot(2, s))).toEqual([0, 3]);
   });
 });
+
+describe("workout styles in the plan", () => {
+  const yoga: Answers = { ...base, format: "yoga", equipment: [] };
+  const allIds = (plan: ReturnType<typeof generatePlan>) => plan.days.flatMap((d) => d.items.map((i) => i.exerciseId));
+
+  it("yoga plans use only yoga poses; gym and strength plans never do", () => {
+    for (const days of [2, 3, 5]) {
+      for (const id of allIds(generatePlan({ ...yoga, days, minutes: 45 }, 0))) expect(byId(id).style).toBe("yoga");
+      for (const profile of [{ ...base, format: "gym" as const, equipment: ["gym" as const] }, { ...base, format: "strength" as const }])
+        for (const id of allIds(generatePlan({ ...profile, days, minutes: 45 }, 0))) expect(byId(id).style).toBeUndefined();
+    }
+  });
+
+  it("yoga plans fit the minutes of each day (after the 5-minute warm-up and cool-down)", () => {
+    for (const days of [2, 3, 4, 6])
+      for (const minutes of [15, 30, 60]) {
+        const plan = generatePlan({ ...yoga, days, minutes }, 0);
+        expect(plan.days.length).toBeGreaterThan(0);
+        for (const d of plan.days) expect(d.totalMin + ROUTINE_MINUTES).toBeLessThanOrEqual(minutes);
+      }
+  });
+
+  it("yoga poses are held once: 30 seconds for newcomers (45 otherwise), 5 seconds longer each step, never above 90", () => {
+    const pose = byId("tree-pose");
+    expect(targetFor(pose, { goal: "stay_active", level: "beginner" }, 0)).toEqual({ sets: 1, reps: 30 });
+    expect(targetFor(pose, { goal: "stay_active", level: "some_experience" }, 0)).toEqual({ sets: 1, reps: 45 });
+    expect(targetFor(pose, { goal: "stay_active", level: "beginner" }, 4).reps).toBe(50);
+    expect(targetFor(pose, { goal: "stay_active", level: "beginner" }, 99).reps).toBe(90);
+  });
+
+  it("yoga flows are one block of minutes, like cardio", () => {
+    expect(targetFor(byId("gentle-flow"), { goal: "stay_active", level: "beginner" }, 5)).toEqual({ sets: 1, reps: byId("gentle-flow").durationMin });
+  });
+
+  it("gentle yoga has no muscle conflicts, so with 2 days each day mixes at least 3 groups", () => {
+    const plan = generatePlan({ ...yoga, days: 2, minutes: 60 }, 0);
+    expect(plan.days).toHaveLength(2);
+    for (const d of plan.days) expect(d.groups.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("the same safety rules apply: sore knees remove knee-loading poses, sore wrists remove weight-on-hands poses", () => {
+    const knee = usableFor({ ...yoga, limitations: ["knee"] }).map((e) => e.id);
+    for (const id of ["chair-pose", "warrior-two", "pigeon-pose", "childs-pose"]) expect(knee).not.toContain(id);
+    expect(knee).toContain("mountain-pose");
+    const wrist = usableFor({ ...yoga, limitations: ["wrist"] }).map((e) => e.id);
+    for (const id of ["downward-dog", "plank-pose", "cat-cow", "cobra-pose", "thread-needle", "sun-salutation"]) expect(wrist).not.toContain(id);
+    expect(wrist).toContain("bridge-pose");
+  });
+
+  it("a home gym (dumbbells, bands, pull-up bar) never gets gym-only exercises, a full gym does", () => {
+    const home = usableFor({ ...base, format: "gym", equipment: ["dumbbells", "resistance_band", "pull_up_bar"] });
+    expect(home.some((e) => e.equipment.includes("gym"))).toBe(false);
+    expect(home.some((e) => e.equipment.includes("dumbbells"))).toBe(true);
+    const full = usableFor({ ...base, format: "gym", equipment: ["gym"] });
+    expect(full.some((e) => e.equipment.includes("gym"))).toBe(true);
+  });
+
+  it("swapping a yoga pose gives another yoga pose for the same muscle group", () => {
+    const usable = usableFor(yoga);
+    const swap = chooseSwap(byId("tree-pose"), usable, ["tree-pose"], 3, 30)!;
+    expect(swap).not.toBeNull();
+    expect(swap.style).toBe("yoga");
+    expect(swap.muscleGroup).toBe("legs");
+  });
+});

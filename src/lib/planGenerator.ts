@@ -9,6 +9,7 @@
 
 import { EXERCISES } from "../data/exercises";
 import { overloadClosedForm } from "./math/recurrence";
+import { fitsFormat, formatOf } from "./formats";
 import { excludedExerciseIds } from "./math/logic";
 import { MUSCLE_CONFLICTS, MUSCLE_GROUPS, scheduleGroups, type Graph } from "./math/graphColouring";
 import { knapsack } from "./math/knapsack";
@@ -37,10 +38,15 @@ export interface GeneratedPlan {
   daysUsed: number;
 }
 
-/** Step 1 + 2: the exercises this person may do. */
+/**
+ * Step 1 + 2: the exercises this person may do.
+ * Their style picks the library first: yoga plans use only yoga poses, Gym and Strength plans never do.
+ */
 export function usableFor(profile: Answers, all: Exercise[] = EXERCISES): Exercise[] {
-  const excluded = excludedExerciseIds(all, profile);
-  return usableExercises(all, profile.equipment, excluded);
+  const format = formatOf(profile);
+  const inStyle = all.filter((e) => fitsFormat(e, format));
+  const excluded = excludedExerciseIds(inStyle, profile);
+  return usableExercises(inStyle, profile.equipment, excluded);
 }
 
 /** Which weekdays (0 = Mon) to train on, spread out to leave rest days. */
@@ -62,6 +68,11 @@ export const weekdayForSlot = (daysUsed: number, slot: number): number =>
 export function targetFor(ex: Exercise, profile: Pick<Answers, "goal" | "level">, steps: number) {
   // Cardio is one continuous block of minutes; its length stays fixed so the day's time budget holds.
   if (ex.unit === "minutes") return { sets: 1, reps: ex.durationMin };
+  // Yoga poses are held once, gently longer each week (30 s for newcomers, up to 90 s).
+  if (ex.style === "yoga") {
+    const w0 = profile.level === "beginner" ? 30 : 45;
+    return { sets: 1, reps: Math.min(overloadClosedForm(w0, 5, steps), 90) };
+  }
   const sets = profile.level === "beginner" ? 2 : 3;
   if (ex.unit === "seconds") {
     const w0 = profile.level === "beginner" ? 20 : 30;
@@ -86,9 +97,11 @@ export function generatePlan(profile: Answers, steps: number, all: Exercise[] = 
 
   // Only muscle groups that have at least one usable exercise take part in the schedule.
   const groups = MUSCLE_GROUPS.filter((g) => usable.some((e) => e.muscleGroup === g));
+  // Strength muscles that share work conflict (graph edges). Gentle yoga does not, so any groups can share a day.
+  const conflicts = formatOf(profile) === "yoga" ? [] : MUSCLE_CONFLICTS;
   const graph: Graph = {
     vertices: groups,
-    edges: MUSCLE_CONFLICTS.filter(([a, b]) => groups.includes(a as never) && groups.includes(b as never)),
+    edges: conflicts.filter(([a, b]) => groups.includes(a as never) && groups.includes(b as never)),
   };
   const daysUsed = Math.min(profile.days, groups.length);
   if (daysUsed === 0) return { days: [], daysUsed: 0 };

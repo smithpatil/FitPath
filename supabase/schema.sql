@@ -27,6 +27,8 @@ create table if not exists public.profiles (
   equipment           text[] not null default '{}',
   limitations         text[] not null default '{}',
   units               text not null default 'kg' check (units in ('kg','lb')),
+  -- Phase: workout style (also in migrations/005_workout_style.sql)
+  format              text check (format is null or format in ('gym','strength','yoga')),
   onboarded_at        timestamptz,
   created_at          timestamptz not null default now()
 );

@@ -1,10 +1,13 @@
-// The six onboarding questions, and a checker for the answers.
-// Kept free of React/database code so it can be unit-tested.
+// The choices a person makes when setting up (style, goal, days, minutes, equipment, sore areas),
+// and a checker for them. Kept free of React/database code so it can be unit-tested.
+import { FORMAT_ORDER, deriveFormat, normaliseEquipment, type Format } from "./formats";
 import type { Equipment, Level, Limitation } from "./math/types";
 
 export type Goal = "lose_weight" | "build_strength" | "stay_active";
 
 export interface Answers {
+  /** Gym, Strength or Yoga. Older profiles have none; it is then worked out from the equipment. */
+  format?: Format;
   goal: Goal;
   level: Level;
   days: number;
@@ -58,6 +61,7 @@ export function validateAnswers(input: unknown): ValidationResult {
   if (typeof input !== "object" || input === null) return bad("Missing answers.");
   const a = input as Record<string, unknown>;
 
+  if (a.format !== undefined && !FORMAT_ORDER.includes(a.format as Format)) return bad("Please choose Gym, Strength or Yoga.");
   if (!values(GOALS).includes(a.goal as Goal)) return bad("Please choose a goal.");
   if (!values(LEVELS).includes(a.level as Level)) return bad("Please choose your experience level.");
   if (!DAY_OPTIONS.includes(a.days as number)) return bad("Please choose how many days per week.");
@@ -69,15 +73,17 @@ export function validateAnswers(input: unknown): ValidationResult {
   if (!eq || !eq.every((e) => values(EQUIPMENT).includes(e as Equipment))) return bad("Unknown equipment.");
   if (!lim || !lim.every((l) => values(LIMITATIONS).includes(l as Limitation))) return bad("Unknown limitation.");
 
+  // Gym keeps either "a full gym" or the home-gym items, Strength never has a gym, Yoga has no equipment.
+  const format = (a.format as Format | undefined) ?? deriveFormat(eq as Equipment[]);
   return {
     ok: true,
     data: {
+      format,
       goal: a.goal as Goal,
       level: a.level as Level,
       days: a.days as number,
       minutes: a.minutes as number,
-      // A gym has everything, so choosing it replaces the other choices.
-      equipment: (eq as Equipment[]).includes("gym") ? ["gym"] : [...new Set(eq as Equipment[])],
+      equipment: normaliseEquipment(format, eq as Equipment[]),
       limitations: [...new Set(lim as Limitation[])],
     },
   };

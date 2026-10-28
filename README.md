@@ -1,6 +1,6 @@
 # FitPath
 
-A calm, beginner-friendly fitness website. Answer six questions and get a weekly workout plan built by **discrete mathematics** (not AI). Log workouts, see progress, and ask a simple AI coach basic questions.
+A calm, beginner-friendly fitness website. Choose Gym, Strength or Yoga, set a few options, and get a weekly workout plan built by **discrete mathematics** (not AI). Log workouts, see progress, and ask a simple AI coach basic questions.
 
 This is also a discrete-maths course project: the maths that builds each plan is in `src/lib/math/` (with tests).
 
@@ -29,7 +29,7 @@ Next.js (App Router) · TypeScript · Tailwind CSS · Supabase (login + database
 src/lib/math/       The 7 maths concepts (pure functions + tests)
 src/lib/planGenerator.ts   Wires the maths together into a weekly plan
 src/lib/coach/      Coach safety rules, prompt and rate limit
-src/data/exercises.ts      The 74 exercises (home + gym + cardio): the single source of truth
+src/data/exercises.ts      The 100 exercises (strength, cardio and yoga): the single source of truth
 src/app/            Pages (login is the home page, onboarding, dashboard, plan, progress, maths, coach, settings)
 supabase/           schema.sql and seed.sql
 ```

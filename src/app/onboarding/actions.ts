@@ -19,7 +19,7 @@ export async function saveOnboarding(input: unknown): Promise<{ error: string }>
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { error } = await supabase.from("profiles").upsert({
+  const row = {
     id: user.id,
     goal: a.goal,
     level: a.level,
@@ -28,10 +28,21 @@ export async function saveOnboarding(input: unknown): Promise<{ error: string }>
     equipment: a.equipment,
     limitations: a.limitations,
     onboarded_at: new Date().toISOString(),
-  });
+  };
+  let { error } = await supabase.from("profiles").upsert({ ...row, format: a.format });
+  if (error && a.format !== "yoga") {
+    // The "format" column needs the style database update. Gym and Strength can still be saved
+    // without it (the style is worked out from the equipment), but Yoga cannot.
+    ({ error } = await supabase.from("profiles").upsert(row));
+  }
   if (error) {
     console.error("[onboarding]", error.message);
-    return { error: "We could not save your answers. Please try again." };
+    return {
+      error:
+        a.format === "yoga"
+          ? "We could not save Yoga yet. The database needs the style update (supabase/migrations/005_workout_style.sql)."
+          : "We could not save your choices. Please try again.",
+    };
   }
   // New answers mean a new plan: drop this week's plan so it is rebuilt from the maths.
   // (Past workout logs are kept, so streaks and progress are not lost.)

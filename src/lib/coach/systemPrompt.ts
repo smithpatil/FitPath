@@ -6,6 +6,8 @@ export interface CoachContext {
   days: number;
   minutes: number;
   equipment: string;
+  /** Gym, Strength or Yoga. */
+  style?: string;
   limitations: string;
   /** One line per workout day, e.g. "Monday: Push-up (2 sets of 8 reps), Plank (2 sets of 20 seconds)". */
   plan: string[];
@@ -29,6 +31,7 @@ About this user:
 - Goal: ${c.goal}
 - Experience: ${c.level}
 - Trains ${c.days} days a week, up to ${c.minutes} minutes each day
+- Workout style: ${c.style ?? "Strength"}
 - Equipment: ${c.equipment}
 - Limits or sore areas: ${c.limitations}
 

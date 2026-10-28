@@ -69,7 +69,7 @@ export default function Hero(props: HeroProps) {
               <p className="mt-4 max-w-md text-lg text-ice">Try changing your equipment or sore areas and we&apos;ll have another go.</p>
               <div className="mt-8">
                 <ButtonLink href="/onboarding" variant="spark" arrow>
-                  Edit my answers
+                  Change my workout
                 </ButtonLink>
               </div>
             </>

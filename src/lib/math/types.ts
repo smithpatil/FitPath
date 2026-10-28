@@ -32,6 +32,8 @@ export interface Exercise {
   /** Ids of the slightly easier exercises this one builds on (progression). */
   easierIds: string[];
   howTo: string;
+  /** "yoga" for yoga poses; empty for strength and cardio exercises. */
+  style?: "yoga";
 }
 
 export type SafetyTag = "knee_load" | "spine_load" | "overhead" | "wrist_load";

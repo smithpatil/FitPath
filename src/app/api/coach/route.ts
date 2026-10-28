@@ -3,6 +3,7 @@ import { WEEKDAYS } from "@/lib/dates";
 import { createLimiter } from "@/lib/coach/rateLimit";
 import { sanitizeMessages, withSafetyNotes } from "@/lib/coach/safety";
 import { buildSystemPrompt } from "@/lib/coach/systemPrompt";
+import { FORMAT_INFO, formatOf } from "@/lib/formats";
 import { describeTarget } from "@/lib/labels";
 import { EQUIPMENT, GOALS, LEVELS, LIMITATIONS } from "@/lib/onboarding";
 import { getCurrentWeek } from "@/lib/planStore";
@@ -50,6 +51,7 @@ export async function POST(request: Request) {
     level: labelOf(LEVELS, profile.level),
     days: profile.days,
     minutes: profile.minutes,
+    style: FORMAT_INFO[formatOf(profile)].title,
     equipment: profile.equipment.length ? profile.equipment.map((e) => labelOf(EQUIPMENT, e)).join(", ") : "No equipment",
     limitations: profile.limitations.length ? profile.limitations.map((l) => labelOf(LIMITATIONS, l)).join(", ") : "None",
     plan,

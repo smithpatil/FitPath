@@ -14,6 +14,7 @@ import { getCurrentWeek } from "@/lib/planStore";
 import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 import { EXERCISES } from "@/data/exercises";
+import { FORMAT_INFO, fitsFormat, formatOf } from "@/lib/formats";
 import { scheduleGroupsForDay } from "../groups";
 
 export const metadata = { title: "Your plan — FitPath" };
@@ -89,7 +90,7 @@ export default async function PlanPage() {
       <section aria-labelledby="how" className="rounded-card bg-white p-6 shadow-card ring-1 ring-gray-100">
         <h2 id="how" className="text-xl font-extrabold">How was this plan made?</h2>
         <p className="mt-2 text-muted">
-          Out of {EXERCISES.length} exercises, {usableCount} suit your equipment and safety answers. Muscles that work together are placed on
+          Out of {EXERCISES.filter((e) => fitsFormat(e, formatOf(profile))).length} {FORMAT_INFO[formatOf(profile)].title.toLowerCase()} exercises, {usableCount} suit your equipment and safety answers. Muscles that work together are placed on
           different days so they can rest. Each day is filled with the most useful exercises that fit in your {profile.minutes} minutes.
         </p>
       </section>
