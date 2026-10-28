@@ -21,6 +21,9 @@ After login a new user sees **three illustrated cards: Gym, Strength, Yoga** (`s
 - Wording follows the style: yoga says "poses", "Start session", "Hold 30 seconds" and names days like "Flow for shoulders, spine and arms" (`dayFocus`, `groupLabel`, `itemWord` in `src/lib/labels.ts`); the home hero shows the style name and a matching picture (`FormatArt`).
 - Yoga plans have no muscle-group conflicts in the graph (gentle, so groups can share a day) and hold times start at 30 s (45 s if experienced), +5 s per step, max 90 s.
 
+## Progress page
+Sections: Your numbers (6 tiles; Gym/Strength show exercises done + weight lifted, Yoga shows poses done + longest hold), Milestones and badges (next-milestone bar + 9 badges), Your calendar (month heat map, `?month=YYYY-MM` links), Workouts each week, Best lifts (hidden for Yoga), Body weight. All numbers come from pure, tested functions in `src/lib/stats.ts` (`computeStats`, `badgesFor`, `nextMilestone`, `monthGrid`); data loaded by `getLogRows` in `src/lib/planStore.ts`.
+
 ## Pages (MVP)
 NO landing page: the website's home (`/`) IS the login form (logged-in visitors see an "already logged in" choice) · Sign up/Log in · Onboarding (one question per screen + progress bar) · Dashboard · Workout plan (Mark as done, Swap exercise) · Progress · Settings (profile, kg/lb, delete account).
 Navbar: Today, Plan, Progress, Settings.

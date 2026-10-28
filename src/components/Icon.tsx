@@ -23,7 +23,8 @@ export type IconName =
   | "sliders"
   | "smile"
   | "drop"
-  | "heart";
+  | "heart"
+  | "star";
 
 const PATHS: Record<IconName, ReactNode> = {
   dumbbell: (
@@ -119,6 +120,7 @@ const PATHS: Record<IconName, ReactNode> = {
     </>
   ),
   drop: <path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z" />,
+  star: <polygon points="12 2.5 14.9 8.8 21.8 9.5 16.6 14.1 18.2 21 12 17.5 5.8 21 7.4 14.1 2.2 9.5 9.1 8.8 12 2.5" />,
   heart: <path d="M12 20s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.7A4.5 4.5 0 0 1 20 9c0 6.2-8 11-8 11z" />,
 };
 

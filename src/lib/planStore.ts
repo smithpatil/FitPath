@@ -4,6 +4,7 @@ import { EXERCISES } from "../data/exercises";
 import { mondayOf, toISODate, weeksBetween } from "./dates";
 import { multipliersFromFeedback, stepSum, type Feeling } from "./math/recurrence";
 import { generatePlan, weekdayForSlot } from "./planGenerator";
+import type { LogRow } from "./stats";
 import type { LoggedResult } from "./strength";
 import { getToday } from "./today.server";
 import type { Profile } from "./profile";
@@ -175,4 +176,32 @@ export async function getLoggedResults(supabase: SupabaseClient): Promise<(Logge
       date: r.completed_on,
     };
   });
+}
+
+/**
+ * Every finished exercise (up to 5000), for the Progress page statistics.
+ * Older databases without the "what you did" columns still work: those fields are just empty.
+ */
+export async function getLogRows(supabase: SupabaseClient): Promise<LogRow[]> {
+  const full = await supabase
+    .from("workout_logs")
+    .select("exercise_id, completed_on, amount_done, weight_kg, plan_items(reps, sets)")
+    .order("completed_on", { ascending: false })
+    .limit(5000);
+  if (!full.error && full.data) {
+    return full.data.map((r) => {
+      const pi = r.plan_items as { reps: number; sets: number } | { reps: number; sets: number }[] | null;
+      const item = Array.isArray(pi) ? (pi[0] ?? null) : pi;
+      return {
+        exerciseId: r.exercise_id,
+        date: r.completed_on,
+        amount: r.amount_done,
+        weightKg: r.weight_kg === null ? null : Number(r.weight_kg),
+        sets: item?.sets ?? null,
+        target: item?.reps ?? null,
+      };
+    });
+  }
+  const basic = await supabase.from("workout_logs").select("exercise_id, completed_on").order("completed_on", { ascending: false }).limit(5000);
+  return (basic.data ?? []).map((r) => ({ exerciseId: r.exercise_id, date: r.completed_on, amount: null, weightKg: null, sets: null, target: null }));
 }
