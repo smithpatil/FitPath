@@ -1,6 +1,8 @@
-import Link from "next/link";
 import ExerciseCard from "@/components/ExerciseCard";
 import FeedbackCard from "@/components/FeedbackCard";
+import Icon from "@/components/Icon";
+import PageHeader from "@/components/PageHeader";
+import DayHeader from "@/components/plan/DayHeader";
 import RescheduleCard from "@/components/RescheduleCard";
 import { WEEKDAYS, weekdayIndex } from "@/lib/dates";
 import { getToday } from "@/lib/today.server";
@@ -32,20 +34,18 @@ export default async function PlanPage() {
 
   return (
     <div className="space-y-10">
-      <header>
-        <h1 className="text-3xl font-bold">Your weekly plan</h1>
-        <p className="mt-2 text-muted">
-          Week {week.weekIndex + 1} of your plan. Each week the numbers go up a little, so you keep improving. After finishing a
-          workout day, tell us how it felt: your answers decide how fast next week&apos;s numbers rise.
-        </p>
-      </header>
+      <PageHeader icon="list" eyebrow={`Week ${week.weekIndex + 1}`} title="Your weekly plan">
+        Each week the numbers go up a little. After a workout, tell us how it felt and next week adapts.
+      </PageHeader>
 
-      <section aria-labelledby="words" className="rounded-2xl bg-accent-soft p-6">
-        <h2 id="words" className="text-xl font-semibold text-accent-dark">Quick word guide</h2>
-        <ul className="mt-2 space-y-1 text-base">
-          <li><strong>Rep</strong> (repetition): doing the movement once.</li>
-          <li><strong>Set</strong>: a group of reps. &quot;2 sets of 8&quot; means 8 reps, a short rest, then 8 more.</li>
-          <li><strong>Seconds</strong>: for some moves you hold a position instead of counting reps.</li>
+      <section aria-labelledby="words" className="rounded-card bg-accent-soft p-6 ring-1 ring-accent/15">
+        <h2 id="words" className="flex items-center gap-2 text-xl font-extrabold text-accent-dark">
+          <Icon name="smile" className="h-6 w-6" /> Quick word guide
+        </h2>
+        <ul className="mt-3 grid gap-3 text-base sm:grid-cols-3">
+          <li className="rounded-2xl bg-white p-4 shadow-card"><strong>Rep</strong><br />Doing the movement once.</li>
+          <li className="rounded-2xl bg-white p-4 shadow-card"><strong>Set</strong><br />A group of reps. &quot;2 sets of 8&quot; = 8 reps, rest, 8 more.</li>
+          <li className="rounded-2xl bg-white p-4 shadow-card"><strong>Seconds</strong><br />Hold a position instead of counting reps.</li>
         </ul>
         <p className="mt-3 text-base">Move slowly, breathe normally, and stop if anything hurts.</p>
       </section>
@@ -56,27 +56,22 @@ export default async function PlanPage() {
         <p className="text-muted">We could not build a plan from your answers. Try changing your equipment or limits in Settings.</p>
       ) : (
         week.days.map((d) => (
-          <section key={d.slot} aria-labelledby={`day-${d.slot}`}>
-            <h2 id={`day-${d.slot}`} className="text-2xl font-bold">
-              {WEEKDAYS[d.weekday]}
-              {missed.includes(d) && <span className="ml-3 rounded-full bg-amber-200 px-3 py-0.5 align-middle text-base font-medium text-amber-950">Missed</span>}
-            </h2>
-            <p className="mt-1 text-muted">
-              {groupTitle(scheduleGroupsForDay(d.items))} · about {d.items.reduce((s, i) => s + i.exercise.durationMin, 0) + ROUTINE_MINUTES}{" "}
-              minutes including warm-up and cool-down (your limit is {profile.minutes} minutes for each workout day)
-            </p>
-            {d.items.some((i) => !i.done) && (
-              <p className="mt-2">
-                <Link href={`/workout?day=${d.slot}`} className="font-semibold text-accent underline">
-                  Start this workout in workout mode →
-                </Link>
-              </p>
-            )}
-            {d.items.reduce((s, i) => s + i.exercise.durationMin, 0) < exerciseMinutes(profile.minutes) * 0.7 && (
-              <p className="mt-1 text-base text-muted">
-                This workout is shorter than your limit because your equipment and safety answers leave fewer moves to choose from.
-              </p>
-            )}
+          <section key={d.slot} aria-labelledby={`day-${d.slot}`} className="scroll-mt-24">
+            <DayHeader
+              id={`day-${d.slot}`}
+              weekday={WEEKDAYS[d.weekday]}
+              focus={groupTitle(scheduleGroupsForDay(d.items))}
+              minutes={d.items.reduce((s, i) => s + i.exercise.durationMin, 0) + ROUTINE_MINUTES}
+              limit={profile.minutes}
+              exerciseCount={d.items.length}
+              missed={missed.includes(d)}
+              startHref={d.items.some((i) => !i.done) ? `/workout?day=${d.slot}` : null}
+              note={
+                d.items.reduce((s, i) => s + i.exercise.durationMin, 0) < exerciseMinutes(profile.minutes) * 0.7
+                  ? "Shorter than your limit: your equipment and safety answers leave fewer moves to choose from."
+                  : undefined
+              }
+            />
             <RoutineBox title="Warm-up first" moves={warmup} />
             <ul className="mt-5 space-y-4">
               {d.items.map((item) => (
@@ -91,8 +86,8 @@ export default async function PlanPage() {
         ))
       )}
 
-      <section aria-labelledby="how" className="rounded-2xl border-2 border-gray-200 p-6">
-        <h2 id="how" className="text-xl font-semibold">How was this plan made?</h2>
+      <section aria-labelledby="how" className="rounded-card bg-white p-6 shadow-card ring-1 ring-gray-100">
+        <h2 id="how" className="text-xl font-extrabold">How was this plan made?</h2>
         <p className="mt-2 text-muted">
           Out of {EXERCISES.length} exercises, {usableCount} suit your equipment and safety answers. Muscles that work together are placed on
           different days so they can rest. Each day is filled with the most useful exercises that fit in your {profile.minutes} minutes.
@@ -105,8 +100,9 @@ export default async function PlanPage() {
 /** Warm-up / cool-down summary for one day. */
 function RoutineBox({ title, moves }: { title: string; moves: RoutineMove[] }) {
   return (
-    <div className="mt-5 rounded-2xl bg-accent-soft px-5 py-4">
-      <p className="font-semibold text-accent-dark">
+    <div className="mt-5 rounded-card bg-accent-soft px-5 py-4 ring-1 ring-accent/15">
+      <p className="flex items-center gap-2 font-extrabold text-accent-dark">
+        <Icon name="timer" className="h-5 w-5" />
         {title} · about {Math.round(totalSeconds(moves) / 60)} minutes
       </p>
       <p className="mt-1 text-base">{moves.map((m) => `${m.name} (${m.seconds} s)`).join(" · ")}</p>

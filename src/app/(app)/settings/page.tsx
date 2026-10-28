@@ -1,4 +1,5 @@
 import Link from "next/link";
+import PageHeader from "@/components/PageHeader";
 import ButtonLink from "@/components/Button";
 import { logout } from "@/app/(auth)/actions";
 import { EQUIPMENT, GOALS, LEVELS, LIMITATIONS } from "@/lib/onboarding";
@@ -29,12 +30,9 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-12">
-      <header>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="mt-2 text-muted">
-          Signed in as <strong className="text-ink">{user?.email}</strong>
-        </p>
-      </header>
+      <PageHeader icon="sliders" eyebrow="Your account" title="Settings">
+        Signed in as <strong className="text-white">{user?.email}</strong>
+      </PageHeader>
 
       <section aria-labelledby="profile">
         <h2 id="profile" className="text-2xl font-bold">

@@ -38,9 +38,13 @@ Exercise selection and scheduling come ONLY from these functions.
 - Short disclaimer on the onboarding screens.
 
 ## Design rules
-Minimal, lots of white space, ONE accent colour (teal), large readable text, rounded buttons, simple sans-serif.
-Mobile-first, responsive. Big obvious buttons, clear labels, no hidden menus. Accessible: good contrast, keyboard navigation, alt text.
-No heavy animation, popups, or autoplay video. Plain language for beginners; explain terms (e.g. "reps" = how many times you do a movement).
+Light, energetic "fitness website" look (visual refresh on top of the original teal): big illustrated hero panels, icon cards, short copy, strong headings.
+Tokens live in `src/app/globals.css`: `accent` teal #0f766e (buttons, links) · `accent-dark` · `accent-soft` mint panels · `deep` near-black teal (hero/banner gradients, with white text) · `ice` light mint text on deep · `spark` amber (the one "pop" colour: flames, badges, main button on deep panels) · `ink` / `muted` text.
+Use semantic tokens, never raw hex. NEVER name a colour token `base` (collides with Tailwind's `text-base`).
+Shared pieces: `Icon` (own SVG icon set, no library), `art/AthleteArt` (hero illustration), `Logo`, `Button` (primary/outline/light/spark), `PageHeader`, `dashboard/*` (Hero, TodaySteps = "what to do today", Stats, WeekStrip, QuickLinks), `plan/DayHeader`, `landing/SampleWeek`.
+Phones get a bottom tab bar (Navbar); the coach button sits above it. Navbar has 4 items. Mobile-first, big buttons, no hidden menus, no popups, no autoplay video. Gentle floating animation only, disabled for reduced-motion.
+Accessibility: WCAG 2.2 AA; focus ring teal (amber on deep panels via `.on-deep`); contrast audited by script (0 failures on landing and login).
+Plain language for beginners; explain terms (e.g. "reps" = how many times you do a movement).
 
 ## Working style
 Build in small phases and stop after each for the user to test. Give exact run/test commands (Windows PowerShell).

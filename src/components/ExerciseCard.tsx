@@ -3,10 +3,11 @@ import { describeTarget, EQUIPMENT_LABEL, GROUP_LABEL } from "@/lib/labels";
 import type { WeekItem } from "@/lib/planStore";
 import { describeResult, isWeighted, suggestionFor } from "@/lib/strength";
 import { fromKg, type Unit } from "@/lib/units";
+import Icon, { groupIcon } from "./Icon";
 import LogResultForm from "./LogResultForm";
 import SwapButton from "./SwapButton";
 
-// One exercise with its sets/reps, a how-to note, last time's result, and the action buttons.
+// One exercise as a card: an icon badge, the name, a bold target, small tags, how-to, and the buttons.
 export default function ExerciseCard({ item, units, compact }: { item: WeekItem; units: Unit; compact?: boolean }) {
   const { exercise: ex } = item;
   const weighted = isWeighted(ex);
@@ -14,46 +15,62 @@ export default function ExerciseCard({ item, units, compact }: { item: WeekItem;
   const lastText = item.last ? describeResult(item.last, ex.unit, units) : "";
 
   return (
-    <li className={`rounded-2xl border-2 p-5 ${item.done ? "border-accent bg-accent-soft" : "border-gray-200"}`}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="text-xl font-semibold">
-            {item.done && <span aria-hidden="true">✓ </span>}
-            {ex.name}
-          </h3>
-          <p className="mt-1 text-lg font-medium text-accent-dark">{describeTarget(item.sets, item.reps, ex.unit)}</p>
-          <p className="text-base text-muted">
-            {GROUP_LABEL[ex.muscleGroup]} · {EQUIPMENT_LABEL[ex.equipment[0]]} · about {ex.durationMin} min
+    <li
+      className={`rounded-card p-5 sm:p-6 ${
+        item.done ? "bg-accent-soft ring-2 ring-accent" : "bg-white shadow-card ring-1 ring-gray-100"
+      }`}
+    >
+      <div className="flex items-start gap-4">
+        <span
+          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${
+            item.done ? "bg-accent text-white" : "bg-gradient-to-br from-accent to-deep text-white"
+          }`}
+        >
+          <Icon name={item.done ? "check" : groupIcon(ex.muscleGroup)} className="h-7 w-7" strokeWidth={item.done ? 3 : 2} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <h3 className="text-xl font-extrabold leading-tight">{ex.name}</h3>
+            {item.done && <span className="rounded-full bg-accent px-3 py-1 text-sm font-extrabold text-white">Done</span>}
+          </div>
+          <p className="mt-1 inline-block rounded-full bg-deep px-3 py-1 text-base font-extrabold text-white">
+            {describeTarget(item.sets, item.reps, ex.unit)}
           </p>
+          <ul className="mt-3 flex flex-wrap gap-2 text-sm font-semibold">
+            {[GROUP_LABEL[ex.muscleGroup], EQUIPMENT_LABEL[ex.equipment[0]], `about ${ex.durationMin} min`].map((t) => (
+              <li key={t} className="rounded-full bg-gray-100 px-3 py-1 text-gray-700">
+                {t}
+              </li>
+            ))}
+          </ul>
           {lastText && !item.done && (
-            <p className="mt-1 text-base">
+            <p className="mt-3 text-base">
               <span className="text-muted">Last time:</span> {lastText}
               {suggestion !== null && (
                 <>
                   {" "}
-                  · <strong>try {suggestion} {units} today</strong>
+                  · <strong className="text-accent-dark">try {suggestion} {units} today</strong>
                 </>
               )}
             </p>
           )}
         </div>
-        {item.done && <span className="rounded-full bg-accent px-3 py-1 text-base font-semibold text-white">Done</span>}
       </div>
 
       {!compact && (
-        <p className="mt-3">
-          <strong>How to do it: </strong>
+        <p className="mt-4 text-muted">
+          <strong className="text-ink">How to do it: </strong>
           {ex.howTo}
         </p>
       )}
 
-      <div className="mt-4 flex flex-wrap items-start gap-3">
+      <div className="mt-5 flex flex-wrap items-start gap-3">
         <form action={toggleDone}>
           <input type="hidden" name="itemId" value={item.id} />
           <button
             type="submit"
-            className={`rounded-full px-6 py-3 text-base font-semibold ${
-              item.done ? "border-2 border-accent text-accent hover:bg-white" : "bg-accent text-white hover:bg-accent-dark"
+            className={`rounded-full px-6 py-3 text-base font-bold transition-colors ${
+              item.done ? "border-2 border-accent text-accent hover:bg-white" : "bg-accent text-white shadow-sm hover:bg-accent-dark"
             }`}
           >
             {item.done ? "Undo" : "Mark as done"}

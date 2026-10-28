@@ -14,7 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <>
       <Navbar />
-      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 pb-24 outline-none">{children}</main>
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 pb-40 outline-none sm:py-10 sm:pb-28">{children}</main>
       <CoachButton />
     </>
   );

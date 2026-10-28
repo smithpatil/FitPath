@@ -1,13 +1,29 @@
 @import "tailwindcss";
 
-/* One accent colour (teal-700 has 5.5:1 contrast on white). */
+/*
+ * Design tokens. Use these names in components (not raw hex values).
+ *   accent      teal: buttons, links, highlights          (5.5:1 on white)
+ *   accent-dark deeper teal for hover and text            (7.6:1 on white)
+ *   accent-soft very light mint panels
+ *   deep        near-black teal for hero and banner panels (white text 15:1)
+ *   ice         light mint text on deep panels             (12:1 on deep)
+ *   spark       energetic amber: the one "pop" colour for flames, badges, and the main button on deep panels
+ *   ink / muted main and softer text on light backgrounds
+ */
 @theme inline {
   --color-accent: #0f766e;
   --color-accent-dark: #115e59;
   --color-accent-soft: #f0fdfa;
+  --color-deep: #042f2e;
+  --color-ice: #ccfbf1;
+  --color-spark: #f59e0b;
   --color-ink: #1f2937;
   --color-muted: #4b5563;
   --font-sans: var(--font-inter), system-ui, sans-serif;
+  --radius-card: 20px;
+  --radius-hero: 32px;
+  --shadow-card: 0 1px 2px rgb(4 47 46 / 0.06), 0 8px 24px -8px rgb(4 47 46 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(4 47 46 / 0.08), 0 16px 40px -12px rgb(4 47 46 / 0.28);
 }
 
 body {
@@ -17,8 +33,40 @@ body {
   line-height: 1.6;
 }
 
+::selection {
+  background: var(--color-accent);
+  color: #ffffff;
+}
+
 /* Clear keyboard focus everywhere */
 :focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+/* On dark panels the focus ring switches to amber so it stays visible */
+.on-deep :focus-visible {
+  outline-color: var(--color-spark);
+}
+
+/* A very gentle float for decorative cards. Switched off for people who prefer less motion. */
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.float-soft {
+  animation: float-soft 6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .float-soft {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
 }

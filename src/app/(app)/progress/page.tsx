@@ -1,4 +1,5 @@
 import BarChart from "@/components/BarChart";
+import PageHeader from "@/components/PageHeader";
 import LineChart from "@/components/LineChart";
 import { toISODate } from "@/lib/dates";
 import { EXERCISES } from "@/data/exercises";
@@ -31,14 +32,11 @@ export default async function ProgressPage() {
 
   return (
     <div className="space-y-12">
-      <header>
-        <h1 className="text-3xl font-bold">Your progress</h1>
-        <p className="mt-2 text-muted">
-          {total === 0
-            ? "Finish your first workout and it will show up here."
-            : `You did ${total} workout ${total === 1 ? "day" : "days"} in the last 8 weeks. Your streak is ${streak} ${streak === 1 ? "week" : "weeks"}.`}
-        </p>
-      </header>
+      <PageHeader icon="chart" eyebrow="Last 8 weeks" title="Your progress">
+        {total === 0
+          ? "Finish your first workout and it will show up here."
+          : `${total} workout ${total === 1 ? "day" : "days"} done. Your streak is ${streak} ${streak === 1 ? "week" : "weeks"}.`}
+      </PageHeader>
 
       <section aria-labelledby="workouts">
         <h2 id="workouts" className="text-2xl font-bold">

@@ -1,3 +1,4 @@
+import PageHeader from "@/components/PageHeader";
 import { getCurrentWeek } from "@/lib/planStore";
 import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
@@ -23,8 +24,9 @@ export default async function CoachPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">Ask the coach</h1>
-      <p className="mt-2 text-muted">Ask simple questions about your plan or getting started. The coach explains and encourages.</p>
+      <PageHeader icon="chat" eyebrow="Friendly help" title="Ask the coach">
+        Ask simple questions about your plan or getting started.
+      </PageHeader>
 
       <div className="mt-6 rounded-2xl bg-accent-soft p-5 text-base text-accent-dark">
         <p>
