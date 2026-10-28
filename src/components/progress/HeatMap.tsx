@@ -4,8 +4,8 @@ import type { MonthGrid } from "@/lib/stats";
 
 const LEVEL_STYLE = [
   "bg-gray-100 text-muted", // no workout
-  "bg-slate-300 text-deep", // a little
-  "bg-slate-400 text-deep", // a good day
+  "bg-emerald-200 text-deep", // a little
+  "bg-emerald-400 text-deep", // a good day
   "bg-accent text-white", // a big day
 ];
 const HEAD = ["M", "T", "W", "T", "F", "S", "S"];
