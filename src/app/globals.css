@@ -11,10 +11,10 @@
  *   ink / muted main and softer text on light backgrounds
  */
 @theme inline {
-  --color-accent: #3d5a80;
-  --color-accent-dark: #293f5c;
+  --color-accent: #2f4b78;
+  --color-accent-dark: #1f3556;
   --color-accent-soft: #f1f4f8;
-  --color-deep: #101c2c;
+  --color-deep: #0c1626;
   --color-ice: #d9e2ec;
   --color-spark: #e8b04a;
   --color-ink: #1f2937;
