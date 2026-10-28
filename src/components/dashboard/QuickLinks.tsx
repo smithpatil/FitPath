@@ -4,7 +4,7 @@ import Icon, { type IconName } from "@/components/Icon";
 const LINKS: { href: string; title: string; text: string; icon: IconName; style: string }[] = [
   { href: "/plan", title: "Weekly plan", text: "Every exercise with how-to notes", icon: "list", style: "on-deep bg-gradient-to-br from-accent to-deep text-white" },
   { href: "/progress", title: "Your progress", text: "Charts, best lifts and weight", icon: "chart", style: "bg-gradient-to-br from-amber-300 to-spark text-deep" },
-  { href: "/coach", title: "Ask the coach", text: "Simple answers, any time", icon: "chat", style: "on-deep bg-gradient-to-br from-deep to-[#163027] text-white" },
+  { href: "/coach", title: "Ask the coach", text: "Simple answers, any time", icon: "chat", style: "on-deep bg-gradient-to-br from-deep to-[#1b2a3d] text-white" },
 ];
 
 // Three colourful cards that lead to the main areas.

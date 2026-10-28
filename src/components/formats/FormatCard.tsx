@@ -5,8 +5,8 @@ import { PHOTOS } from "@/lib/photos";
 
 // The colour wash for the setup banner. The text always sits on a dark background, so contrast is safe.
 export const WASH: Record<Format, string> = {
-  gym: "from-accent via-[#214d3f] to-deep",
-  strength: "from-[#6b7a45] via-[#454f2c] to-deep",
+  gym: "from-accent via-[#293f5c] to-deep",
+  strength: "from-[#4a6b7c] via-[#2f4a58] to-deep",
   yoga: "from-[#5b4b8a] via-[#3a3057] to-deep",
 };
 
