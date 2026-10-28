@@ -35,7 +35,7 @@ export default function TodaySteps({ steps }: { steps: StepItem[] }) {
               <div className="flex items-center justify-between">
                 <span
                   className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
-                    current ? "bg-spark text-deep" : done ? "bg-accent text-white" : "bg-slate-200 text-muted"
+                    current ? "bg-spark text-deep" : done ? "bg-accent text-white" : "bg-gray-100 text-muted"
                   }`}
                 >
                   <Icon name={done ? "check" : s.icon} className="h-6 w-6" strokeWidth={done ? 3 : 2} />

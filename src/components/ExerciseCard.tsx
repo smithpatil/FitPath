@@ -38,7 +38,7 @@ export default function ExerciseCard({ item, units, compact }: { item: WeekItem;
           </p>
           <ul className="mt-3 flex flex-wrap gap-2 text-sm font-semibold">
             {[groupLabel(ex.muscleGroup, ex.style === "yoga" ? "yoga" : undefined), ex.style === "yoga" ? "Mat" : EQUIPMENT_LABEL[ex.equipment[0]], `about ${ex.durationMin} min`].map((t) => (
-              <li key={t} className="rounded-full bg-slate-200 px-3 py-1 text-gray-700">
+              <li key={t} className="rounded-full bg-gray-100 px-3 py-1 text-gray-700">
                 {t}
               </li>
             ))}

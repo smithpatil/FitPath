@@ -26,7 +26,7 @@ export default function WeekStrip({ days, todayWeekday }: { days: StripDay[]; to
             ? "bg-accent-soft ring-1 ring-accent/20"
             : w
               ? "bg-white shadow-card ring-1 ring-gray-100 hover:shadow-lift"
-              : "border border-dashed border-gray-300 bg-slate-100";
+              : "border border-dashed border-gray-300 bg-gray-50";
         const shell = `flex h-full min-h-36 flex-col rounded-2xl p-4 transition-shadow ${look}`;
 
         const inner = (

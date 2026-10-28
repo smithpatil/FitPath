@@ -49,7 +49,7 @@ export default function Badges({
             <li
               key={b.id}
               className={`flex flex-col items-center gap-2 rounded-card p-4 text-center ${
-                b.earned ? "bg-white shadow-card ring-1 ring-amber-200" : "border border-dashed border-gray-300 bg-slate-100"
+                b.earned ? "bg-white shadow-card ring-1 ring-amber-200" : "border border-dashed border-gray-300 bg-gray-50"
               }`}
             >
               <span
