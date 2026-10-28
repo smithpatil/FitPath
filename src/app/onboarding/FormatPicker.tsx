@@ -114,7 +114,7 @@ export default function FormatPicker({ saved }: { saved: Profile | null }) {
       <button
         type="button"
         onClick={() => setFormat(null)}
-        className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-base font-bold text-accent hover:bg-accent-soft"
+        className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-base font-bold text-deep hover:bg-accent-soft"
       >
         <Icon name="arrow-right" className="h-5 w-5 rotate-180" /> Change style
       </button>
@@ -208,7 +208,7 @@ export default function FormatPicker({ saved }: { saved: Profile | null }) {
               </Pick>
             ))}
           </div>
-          <p className="mt-4 rounded-2xl bg-accent-soft p-4 text-base text-accent-dark">
+          <p className="mt-4 rounded-2xl bg-accent-soft p-4 text-base text-deep">
             If you have pain, an injury or a medical condition, please talk to a doctor or physio before you start.
           </p>
         </Section>

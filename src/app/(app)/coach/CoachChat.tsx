@@ -56,7 +56,7 @@ export default function CoachChat({ suggestions }: { suggestions: string[] }) {
                   <button
                     type="button"
                     onClick={() => send(s)}
-                    className="rounded-full border-2 border-accent px-5 py-2 text-base font-medium text-accent hover:bg-accent-soft"
+                    className="rounded-full border-2 border-accent px-5 py-2 text-base font-medium text-deep hover:bg-accent-soft"
                   >
                     {s}
                   </button>

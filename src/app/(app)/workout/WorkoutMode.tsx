@@ -144,13 +144,13 @@ export default function WorkoutMode({
 
   const big = "rounded-full px-8 py-4 text-lg font-semibold";
   const primary = `${big} bg-accent text-white hover:bg-accent-dark`;
-  const outline = `${big} border-2 border-accent text-accent hover:bg-accent-soft`;
+  const outline = `${big} border-2 border-accent text-deep hover:bg-accent-soft`;
 
   return (
     <div>
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h1 className="text-3xl font-bold">Workout mode</h1>
-        <Link href="/dashboard" className="font-semibold text-accent underline">
+        <Link href="/dashboard" className="font-semibold text-deep underline">
           Exit
         </Link>
       </div>
@@ -179,7 +179,7 @@ export default function WorkoutMode({
       <section className="mt-8 rounded-2xl border-2 border-gray-200 p-6">
         {!warmedUp && state.phase !== "complete" ? (
           <div>
-            <p className="text-base font-semibold text-accent">Step 1</p>
+            <p className="text-base font-semibold text-deep">Step 1</p>
             <h2 className="mt-1 text-3xl font-bold">Warm-up (about {Math.round(warmup.reduce((s, m) => s + m.seconds, 0) / 60)} minutes)</h2>
             <p className="mt-2 text-muted">Gently get your body moving. Go at an easy pace.</p>
             <RoutineList moves={warmup} />
@@ -189,7 +189,7 @@ export default function WorkoutMode({
           </div>
         ) : state.phase === "complete" ? (
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-accent-dark">Workout complete!</h2>
+            <h2 className="text-3xl font-bold text-deep">Workout complete!</h2>
             <p className="mt-3 text-muted">Brilliant work. Finish with this cool-down, then drink some water.</p>
             <div className="mx-auto mt-6 max-w-md text-left">
               <h3 className="text-xl font-semibold">Cool-down (about {Math.round(cooldown.reduce((s, m) => s + m.seconds, 0) / 60)} minutes)</h3>
@@ -207,7 +207,7 @@ export default function WorkoutMode({
         ) : state.phase === "resting" ? (
           <div className="text-center">
             <h2 className="text-2xl font-bold">Rest</h2>
-            <p role="timer" className="mt-4 font-mono text-7xl font-bold text-accent-dark">
+            <p role="timer" className="mt-4 font-mono text-7xl font-bold text-deep">
               {formatClock(remaining)}
             </p>
             <p className="mt-4 text-muted">
@@ -224,12 +224,12 @@ export default function WorkoutMode({
           </div>
         ) : (
           <div>
-            <p className="text-base font-semibold text-accent">
+            <p className="text-base font-semibold text-deep">
               Exercise {state.index + 1} of {items.length}
               {doneIds.has(item.id) && " · already done ✓"}
             </p>
             <h2 className="mt-1 text-3xl font-bold">{item.name}</h2>
-            <p className="mt-2 text-xl font-medium text-accent-dark">
+            <p className="mt-2 text-xl font-medium text-deep">
               {item.unit === "minutes"
                 ? `Keep going for ${item.reps} minutes at a comfortable pace`
                 : `Set ${state.set} of ${item.sets}: ${item.unit === "seconds" ? `hold for ${item.reps} seconds` : `${item.reps} reps`}`}
@@ -290,7 +290,7 @@ export default function WorkoutMode({
             {state.phase === "holding" ? (
               <div className="mt-8 text-center">
                 <p className="text-base text-muted">{item.unit === "minutes" ? "Keep going…" : "Hold…"}</p>
-                <p role="timer" className="font-mono text-7xl font-bold text-accent-dark">
+                <p role="timer" className="font-mono text-7xl font-bold text-deep">
                   {formatClock(remaining)}
                 </p>
                 <button type="button" onClick={finishSet} className={`${outline} mt-6`}>

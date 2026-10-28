@@ -12,7 +12,7 @@ export default function SwapButton({ itemId, disabled }: { itemId: string; disab
       <button
         type="submit"
         disabled={pending || disabled}
-        className="rounded-full border-2 border-accent px-5 py-3 text-base font-semibold text-accent hover:bg-accent-soft disabled:opacity-50"
+        className="rounded-full border-2 border-accent px-5 py-3 text-base font-semibold text-deep hover:bg-accent-soft disabled:opacity-50"
       >
         {pending ? "Swapping…" : "Swap exercise"}
       </button>

@@ -12,7 +12,7 @@ const HEAD = ["M", "T", "W", "T", "F", "S", "S"];
 
 // A month calendar where every day you trained is coloured in. Previous and next month are plain links.
 export default function HeatMap({ grid, prevHref, nextHref, todayIso }: { grid: MonthGrid; prevHref: string; nextHref: string | null; todayIso: string }) {
-  const nav = "flex h-11 w-11 items-center justify-center rounded-full border-2 border-gray-200 transition-colors hover:border-accent hover:text-accent";
+  const nav = "flex h-11 w-11 items-center justify-center rounded-full border-2 border-gray-200 transition-colors hover:border-accent hover:text-deep";
   return (
     <div className="rounded-card bg-white p-4 shadow-card ring-1 ring-gray-100 sm:p-6">
       <div className="flex items-center justify-between gap-3">

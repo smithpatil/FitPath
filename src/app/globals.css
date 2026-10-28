@@ -4,7 +4,7 @@
  * Design tokens. Use these names in components (not raw hex values).
  *   accent      orange: buttons, links, highlights          (5.5:1 on white)
  *   accent-dark deeper orange for hover and text            (7.6:1 on white)
- *   accent-soft very light peach panels
+ *   accent-soft very light slate panels
  *   deep        near-black navy for hero and banner panels (white text 15:1)
  *   ice         light slate text on deep panels             (12:1 on deep)
  *   spark       bright amber: the one "pop" colour for flames, badges, and the main button on deep panels
@@ -13,7 +13,7 @@
 @theme inline {
   --color-accent: #c2410c;
   --color-accent-dark: #9a3412;
-  --color-accent-soft: #fff7ed;
+  --color-accent-soft: #f1f5f9;
   --color-deep: #0f172a;
   --color-ice: #e2e8f0;
   --color-spark: #fbbf24;

@@ -5,7 +5,7 @@ type Variant = "primary" | "outline" | "light" | "spark";
 
 const STYLES: Record<Variant, string> = {
   primary: "bg-accent text-white hover:bg-accent-dark shadow-sm",
-  outline: "border-2 border-accent text-accent hover:bg-accent-soft",
+  outline: "border-2 border-accent text-deep hover:bg-accent-soft",
   light: "bg-white text-deep hover:bg-ice shadow-sm", // for deep panels
   spark: "bg-spark text-deep hover:bg-amber-400 shadow-sm", // the energetic main button on deep panels
 };

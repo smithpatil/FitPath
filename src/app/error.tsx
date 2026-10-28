@@ -16,7 +16,7 @@ export default function ErrorPage({ reset }: { error: Error & { digest?: string 
         >
           Try again
         </button>
-        <Link href="/dashboard" className="rounded-full border-2 border-accent px-8 py-4 text-lg font-semibold text-accent hover:bg-accent-soft">
+        <Link href="/dashboard" className="rounded-full border-2 border-accent px-8 py-4 text-lg font-semibold text-deep hover:bg-accent-soft">
           Go to my workouts
         </Link>
       </div>

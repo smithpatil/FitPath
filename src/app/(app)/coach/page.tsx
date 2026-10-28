@@ -28,7 +28,7 @@ export default async function CoachPage() {
         Ask simple questions about your plan or getting started.
       </PageHeader>
 
-      <div className="mt-6 rounded-2xl bg-accent-soft p-5 text-base text-accent-dark">
+      <div className="mt-6 rounded-2xl bg-accent-soft p-5 text-base text-deep">
         <p>
           <strong>Please note:</strong> the coach is an AI helper, not a doctor or a dietitian. It cannot give medical or diet advice. If you
           have pain, an injury or a health condition, check with a doctor or physio. The coach cannot change your plan: use{" "}

@@ -17,7 +17,7 @@ export default function AlreadySignedIn({ email }: { email: string }) {
         <form action={logout}>
           <button
             type="submit"
-            className="w-full rounded-full border-2 border-accent px-8 py-4 text-lg font-bold text-accent transition-colors hover:bg-accent-soft"
+            className="w-full rounded-full border-2 border-accent px-8 py-4 text-lg font-bold text-deep transition-colors hover:bg-accent-soft"
           >
             Log out and use a different account
           </button>

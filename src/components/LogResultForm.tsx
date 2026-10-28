@@ -62,7 +62,7 @@ export default function LogResultForm({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-full border-2 border-accent px-5 py-2 text-base font-semibold text-accent hover:bg-accent-soft disabled:opacity-60"
+          className="rounded-full border-2 border-accent px-5 py-2 text-base font-semibold text-deep hover:bg-accent-soft disabled:opacity-60"
         >
           {pending ? "Saving…" : "Save"}
         </button>
@@ -73,7 +73,7 @@ export default function LogResultForm({
         </p>
       )}
       {state.saved && (
-        <p role="status" className="mt-2 text-base text-accent-dark">
+        <p role="status" className="mt-2 text-base text-deep">
           Saved.
         </p>
       )}

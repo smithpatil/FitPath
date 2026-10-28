@@ -49,7 +49,7 @@ export default function BodyWeightForm({ unit, today }: { unit: string; today: s
         </p>
       )}
       {state.saved && (
-        <p role="status" className="w-full rounded-xl bg-accent-soft px-4 py-3 text-accent-dark">
+        <p role="status" className="w-full rounded-xl bg-accent-soft px-4 py-3 text-deep">
           Saved.
         </p>
       )}

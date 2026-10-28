@@ -14,7 +14,7 @@ export default async function OnboardingPage() {
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4">
         <Logo href={profile ? "/dashboard" : "/"} />
         {profile && (
-          <Link href="/dashboard" className="rounded-full border-2 border-gray-200 px-5 py-2 text-base font-bold transition-colors hover:border-accent hover:text-accent">
+          <Link href="/dashboard" className="rounded-full border-2 border-gray-200 px-5 py-2 text-base font-bold transition-colors hover:border-accent hover:text-deep">
             Back to Today
           </Link>
         )}

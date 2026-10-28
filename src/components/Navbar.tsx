@@ -52,7 +52,7 @@ export default function Navbar() {
               <Link
                 href={l.href}
                 aria-current={isActive(l.href) ? "page" : undefined}
-                className={`flex flex-col items-center gap-1 px-2 pb-2 pt-2.5 text-sm font-semibold ${isActive(l.href) ? "text-accent" : "text-muted"}`}
+                className={`flex flex-col items-center gap-1 px-2 pb-2 pt-2.5 text-sm font-semibold ${isActive(l.href) ? "text-deep" : "text-muted"}`}
               >
                 <span
                   className={`flex h-8 w-14 items-center justify-center rounded-full transition-colors ${

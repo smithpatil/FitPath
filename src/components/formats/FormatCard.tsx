@@ -45,7 +45,7 @@ export default function FormatCard({ format, current, onChoose }: { format: Form
         <button
           type="button"
           onClick={onChoose}
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-4 text-base font-extrabold uppercase tracking-wider text-accent-dark transition-colors after:absolute after:inset-0 after:content-[''] hover:bg-ice"
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-4 text-base font-extrabold uppercase tracking-wider text-deep transition-colors after:absolute after:inset-0 after:content-[''] hover:bg-ice"
         >
           Choose {info.title}
           <Icon name="arrow-right" className="h-5 w-5 transition-transform group-hover:translate-x-1" />

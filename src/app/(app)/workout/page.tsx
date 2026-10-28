@@ -36,7 +36,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams: Prom
         <h1 className="text-3xl font-bold">Workout mode</h1>
         <p className="mt-4 text-muted">There is no workout to do right now. Every workout this week is done. Great job!</p>
         <p className="mt-6">
-          <Link href="/dashboard" className="font-semibold text-accent underline">
+          <Link href="/dashboard" className="font-semibold text-deep underline">
             Back to Today
           </Link>
         </p>

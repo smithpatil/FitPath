@@ -40,7 +40,7 @@ export default async function PlanPage() {
       </PageHeader>
 
       <section aria-labelledby="words" className="rounded-card bg-accent-soft p-6 ring-1 ring-accent/15">
-        <h2 id="words" className="flex items-center gap-2 text-xl font-extrabold text-accent-dark">
+        <h2 id="words" className="flex items-center gap-2 text-xl font-extrabold text-deep">
           <Icon name="smile" className="h-6 w-6" /> Quick word guide
         </h2>
         {formatOf(profile) === "yoga" ? (
@@ -111,7 +111,7 @@ export default async function PlanPage() {
 function RoutineBox({ title, moves }: { title: string; moves: RoutineMove[] }) {
   return (
     <div className="mt-5 rounded-card bg-accent-soft px-5 py-4 ring-1 ring-accent/15">
-      <p className="flex items-center gap-2 font-extrabold text-accent-dark">
+      <p className="flex items-center gap-2 font-extrabold text-deep">
         <Icon name="timer" className="h-5 w-5" />
         {title} · about {Math.round(totalSeconds(moves) / 60)} minutes
       </p>

@@ -60,7 +60,7 @@ export default function AuthForm({
           </p>
         )}
         {state.message && (
-          <p role="status" className="rounded-2xl bg-accent-soft px-4 py-3 text-accent-dark ring-1 ring-accent/20">
+          <p role="status" className="rounded-2xl bg-accent-soft px-4 py-3 text-deep ring-1 ring-accent/20">
             {state.message}
           </p>
         )}
@@ -77,7 +77,7 @@ export default function AuthForm({
 
       <p className="mt-8 text-muted">
         {isLogin ? "New here? " : "Already have an account? "}
-        <Link href={isLogin ? "/signup" : "/login"} className="font-bold text-accent underline underline-offset-4">
+        <Link href={isLogin ? "/signup" : "/login"} className="font-bold text-deep underline underline-offset-4">
           {isLogin ? "Create an account" : "Log in"}
         </Link>
       </p>

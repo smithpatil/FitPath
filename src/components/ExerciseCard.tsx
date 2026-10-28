@@ -49,7 +49,7 @@ export default function ExerciseCard({ item, units, compact }: { item: WeekItem;
               {suggestion !== null && (
                 <>
                   {" "}
-                  · <strong className="text-accent-dark">try {suggestion} {units} today</strong>
+                  · <strong className="text-deep">try {suggestion} {units} today</strong>
                 </>
               )}
             </p>
@@ -70,7 +70,7 @@ export default function ExerciseCard({ item, units, compact }: { item: WeekItem;
           <button
             type="submit"
             className={`rounded-full px-6 py-3 text-base font-bold transition-colors ${
-              item.done ? "border-2 border-accent text-accent hover:bg-white" : "bg-accent text-white shadow-sm hover:bg-accent-dark"
+              item.done ? "border-2 border-accent text-deep hover:bg-white" : "bg-accent text-white shadow-sm hover:bg-accent-dark"
             }`}
           >
             {item.done ? "Undo" : "Mark as done"}

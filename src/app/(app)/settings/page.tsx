@@ -91,7 +91,7 @@ export default async function SettingsPage() {
         <form action={logout} className="mt-4">
           <button
             type="submit"
-            className="rounded-full border-2 border-accent px-8 py-3 text-lg font-semibold text-accent hover:bg-accent-soft"
+            className="rounded-full border-2 border-accent px-8 py-3 text-lg font-semibold text-deep hover:bg-accent-soft"
           >
             Log out
           </button>

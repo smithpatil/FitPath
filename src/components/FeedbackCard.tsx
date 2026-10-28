@@ -17,7 +17,7 @@ const THANKS: Record<Feeling, string> = {
 export default function FeedbackCard({ planId, day, feeling }: { planId: string; day: number; feeling?: Feeling }) {
   return (
     <section aria-labelledby={`feel-${day}`} className="mt-6 rounded-2xl border-2 border-accent bg-accent-soft p-5">
-      <h3 id={`feel-${day}`} className="text-xl font-semibold text-accent-dark">
+      <h3 id={`feel-${day}`} className="text-xl font-semibold text-deep">
         Well done! How did this workout feel?
       </h3>
       <form action={saveFeeling} className="mt-4 flex flex-wrap gap-3">
@@ -33,7 +33,7 @@ export default function FeedbackCard({ planId, day, feeling }: { planId: string;
               value={o.value}
               aria-pressed={chosen}
               className={`rounded-full border-2 px-6 py-3 text-base font-semibold ${
-                chosen ? "border-accent bg-accent text-white" : "border-accent bg-white text-accent hover:bg-accent-soft"
+                chosen ? "border-accent bg-accent text-white" : "border-accent bg-white text-deep hover:bg-accent-soft"
               }`}
             >
               {chosen && <span aria-hidden="true">✓ </span>}

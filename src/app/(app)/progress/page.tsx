@@ -167,7 +167,7 @@ export default async function ProgressPage({ searchParams }: { searchParams: Pro
                 </span>
                 <form action={deleteBodyWeight}>
                   <input type="hidden" name="id" value={r.id} />
-                  <button type="submit" className="rounded-full px-4 py-2 text-base font-medium text-accent underline hover:bg-accent-soft">
+                  <button type="submit" className="rounded-full px-4 py-2 text-base font-medium text-deep underline hover:bg-accent-soft">
                     Remove
                   </button>
                 </form>

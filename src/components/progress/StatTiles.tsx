@@ -17,7 +17,7 @@ export default function StatTiles({ tiles }: { tiles: Tile[] }) {
         <li key={t.label} className="flex flex-col gap-3 rounded-card bg-white p-4 shadow-card ring-1 ring-gray-100 sm:p-5">
           <span
             className={`flex h-11 w-11 items-center justify-center rounded-xl ${
-              t.tone === "amber" ? "bg-amber-100 text-amber-700" : "bg-accent-soft text-accent"
+              t.tone === "amber" ? "bg-amber-100 text-amber-700" : "bg-accent-soft text-deep"
             }`}
           >
             <Icon name={t.icon} className="h-6 w-6" />
