@@ -3,7 +3,7 @@ import Icon from "@/components/Icon";
 import type { MonthGrid } from "@/lib/stats";
 
 const LEVEL_STYLE = [
-  "bg-gray-100 text-muted", // no workout
+  "bg-slate-200 text-muted", // no workout
   "bg-blue-200 text-deep", // a little
   "bg-blue-500 text-deep", // a good day
   "bg-accent text-white", // a big day

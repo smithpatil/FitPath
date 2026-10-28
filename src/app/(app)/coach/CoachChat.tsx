@@ -70,7 +70,7 @@ export default function CoachChat({ suggestions }: { suggestions: string[] }) {
           <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
             <p
               className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-5 py-3 ${
-                m.role === "user" ? "bg-accent text-white" : "bg-gray-100 text-ink"
+                m.role === "user" ? "bg-accent text-white" : "bg-slate-200 text-ink"
               }`}
             >
               <span className="sr-only">{m.role === "user" ? "You: " : "Coach: "}</span>
