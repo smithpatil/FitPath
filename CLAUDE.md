@@ -48,8 +48,8 @@ Exercise selection and scheduling come ONLY from these functions.
 - Short disclaimer on the onboarding screens.
 
 ## Design rules
-Light, energetic "fitness website" look (calm forest-green palette over real photos): big illustrated hero panels, icon cards, short copy, strong headings.
-Tokens live in `src/app/globals.css`: `accent` blue #2f6b57 (buttons, links) · `accent-dark` · `accent-soft` pale green panels · `deep` dark navy #0f211b (hero/banner gradients, with white text) · `ice` light blue text on deep · `spark` amber #e8b04a (the one "pop" colour: flames, badges, main button on deep panels) · `ink` / `muted` text.
+Light, energetic "fitness website" look (one-colour teal palette over real photos): big illustrated hero panels, icon cards, short copy, strong headings.
+Tokens live in `src/app/globals.css`: `accent` blue #0f766e (buttons, links) · `accent-dark` · `accent-soft` pale teal panels · `deep` dark navy #042f2e (hero/banner gradients, with white text) · `ice` light blue text on deep · `spark` light teal #5eead4 (the one "pop" colour: flames, badges, main button on deep panels) · `ink` / `muted` text.
 Use semantic tokens, never raw hex. NEVER name a colour token `base` (collides with Tailwind's `text-base`).
 Shared pieces: `Icon` (own SVG icon set, no library), `Logo`, `Button` (primary/outline/light/spark), `PageHeader`, `dashboard/*` (Hero, TodaySteps = "what to do today", Stats, WeekStrip, QuickLinks), `plan/DayHeader`, `landing/SampleWeek`.
 Phones get a bottom tab bar (Navbar); the coach button sits above it. Navbar has 4 items. Mobile-first, big buttons, no hidden menus, no popups, no autoplay video. Gentle floating animation only, disabled for reduced-motion.

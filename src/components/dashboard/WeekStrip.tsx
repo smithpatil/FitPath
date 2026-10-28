@@ -34,7 +34,7 @@ export default function WeekStrip({ days, todayWeekday }: { days: StripDay[]; to
             <div className="flex items-center justify-between gap-2">
               <span className={`text-sm font-extrabold uppercase tracking-wider ${isToday ? "text-ice" : "text-muted"}`}>{SHORT[d.weekday]}</span>
               {isToday && <span className="rounded-full bg-spark px-2 py-0.5 text-xs font-extrabold text-deep">Today</span>}
-              {w?.missed && !isToday && <span className="rounded-full bg-amber-200 px-2 py-0.5 text-xs font-extrabold text-amber-950">Missed</span>}
+              {w?.missed && !isToday && <span className="rounded-full bg-teal-200 px-2 py-0.5 text-xs font-extrabold text-teal-950">Missed</span>}
               {complete && !isToday && (
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-white">
                   <Icon name="check" className="h-4 w-4" strokeWidth={3} />

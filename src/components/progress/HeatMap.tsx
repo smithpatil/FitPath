@@ -4,8 +4,8 @@ import type { MonthGrid } from "@/lib/stats";
 
 const LEVEL_STYLE = [
   "bg-gray-100 text-muted", // no workout
-  "bg-emerald-200 text-deep", // a little
-  "bg-emerald-400 text-deep", // a good day
+  "bg-teal-200 text-deep", // a little
+  "bg-teal-500 text-deep", // a good day
   "bg-accent text-white", // a big day
 ];
 const HEAD = ["M", "T", "W", "T", "F", "S", "S"];
@@ -47,7 +47,7 @@ export default function HeatMap({ grid, prevHref, nextHref, todayIso }: { grid: 
                 key={cell.iso}
                 aria-label={`${cell.day} ${grid.label.split(" ")[0]}: ${cell.count === 0 ? "no workout" : `${cell.count} ${cell.count === 1 ? "exercise" : "exercises"} done`}${cell.iso === todayIso ? " (today)" : ""}`}
                 className={`flex aspect-square items-center justify-center rounded-lg text-sm font-bold sm:text-base ${LEVEL_STYLE[cell.level]} ${
-                  cell.iso === todayIso ? "ring-2 ring-spark ring-offset-2" : ""
+                  cell.iso === todayIso ? "ring-2 ring-accent ring-offset-2" : ""
                 }`}
               >
                 {cell.day}

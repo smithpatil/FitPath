@@ -30,15 +30,15 @@ export default function DayHeader({
   note?: string;
 }) {
   return (
-    <div className="on-deep relative overflow-hidden rounded-card bg-gradient-to-br from-deep via-[#163027] to-accent p-5 text-white sm:p-6">
+    <div className="on-deep relative overflow-hidden rounded-card bg-gradient-to-br from-deep via-[#064e4a] to-accent p-5 text-white sm:p-6">
       <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-spark/15 blur-3xl" />
       <div className="relative flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h2 id={id} className="text-sm font-extrabold uppercase tracking-widest text-amber-300">
+            <h2 id={id} className="text-sm font-extrabold uppercase tracking-widest text-teal-300">
               {weekday}
             </h2>
-            {missed && <span className="rounded-full bg-amber-200 px-3 py-0.5 text-sm font-extrabold text-amber-950">Missed</span>}
+            {missed && <span className="rounded-full bg-teal-200 px-3 py-0.5 text-sm font-extrabold text-teal-950">Missed</span>}
           </div>
           <p className="mt-1 text-3xl font-extrabold leading-tight tracking-tight">{focus}</p>
           <ul className="mt-4 flex flex-wrap gap-2 text-base font-semibold">

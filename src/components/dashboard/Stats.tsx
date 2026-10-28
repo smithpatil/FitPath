@@ -9,7 +9,7 @@ export default function Stats({ streak, daysDone, daysPlanned }: { streak: numbe
   return (
     <section aria-label="Your stats" className="grid gap-4 sm:grid-cols-2">
       <div className="flex items-center gap-5 rounded-card bg-white p-6 shadow-card ring-1 ring-gray-100">
-        <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+        <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-teal-100 text-teal-800">
           <Icon name="flame" className="h-9 w-9" />
         </span>
         <div>
@@ -30,7 +30,7 @@ export default function Stats({ streak, daysDone, daysPlanned }: { streak: numbe
               cy="40"
               r={R}
               fill="none"
-              stroke="#2f6b57"
+              stroke="#0f766e"
               strokeWidth="9"
               strokeLinecap="round"
               strokeDasharray={C}

@@ -17,7 +17,7 @@ export default function SwapButton({ itemId, disabled }: { itemId: string; disab
         {pending ? "Swapping…" : "Swap exercise"}
       </button>
       {state.error && (
-        <p role="alert" className="mt-2 max-w-md rounded-xl bg-amber-50 px-3 py-2 text-base text-amber-900">
+        <p role="alert" className="mt-2 max-w-md rounded-xl bg-teal-50 px-3 py-2 text-base text-teal-900">
           {state.error}
         </p>
       )}
