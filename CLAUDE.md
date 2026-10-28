@@ -18,6 +18,7 @@ AI Coach: the user first dropped it, then re-added it using the FREE **Groq** AP
 After login a new user sees **three illustrated cards: Gym, Strength, Yoga** (`src/app/onboarding/FormatPicker.tsx`, cards in `src/components/formats/`). Choosing a card opens ONE setup screen with that style's options: Gym = "A gym" or "Home gym" (dumbbells / bands / pull-up bar), Strength = what equipment you own (none needed), Yoga = no equipment; all have goal, days (2-6), minutes (15-60), experience and optional sore areas.
 - Saved as `profiles.format` ('gym' | 'strength' | 'yoga'; migration `005_workout_style.sql`). Old profiles without it: gym if equipment includes "gym", else strength (`src/lib/formats.ts`).
 - Exercise libraries: Gym and Strength use the 74 strength/cardio exercises; **Yoga uses only the 26 poses** (`style: "yoga"` in `src/data/exercises.ts`, held in seconds, flows in minutes). Strength never uses gym-only equipment. Total 100 exercises; after changing them run `npm run seed:gen` and run the new `supabase/seed.sql` in Supabase.
+- Wording follows the style: yoga says "poses", "Start session", "Hold 30 seconds" and names days like "Flow for shoulders, spine and arms" (`dayFocus`, `groupLabel`, `itemWord` in `src/lib/labels.ts`); the home hero shows the style name and a matching picture (`FormatArt`).
 - Yoga plans have no muscle-group conflicts in the graph (gentle, so groups can share a day) and hold times start at 30 s (45 s if experienced), +5 s per step, max 90 s.
 
 ## Pages (MVP)

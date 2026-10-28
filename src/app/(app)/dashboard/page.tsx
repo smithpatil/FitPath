@@ -7,7 +7,8 @@ import Stats from "@/components/dashboard/Stats";
 import TodaySteps, { type StepItem } from "@/components/dashboard/TodaySteps";
 import WeekStrip, { type StripDay } from "@/components/dashboard/WeekStrip";
 import { WEEKDAYS, weekdayIndex } from "@/lib/dates";
-import { groupTitle } from "@/lib/labels";
+import { formatOf } from "@/lib/formats";
+import { dayFocus, groupTitle, itemWord } from "@/lib/labels";
 import { ROUTINE_MINUTES } from "@/lib/planGenerator";
 import { getCurrentWeek, getLogDates } from "@/lib/planStore";
 import { getProfile } from "@/lib/profile";
@@ -31,6 +32,8 @@ export default async function DashboardPage() {
   const streak = weekStreak(logDates, now);
   const daysThisWeek = workoutDaysInWeek(logDates, now);
 
+  const format = formatOf(profile);
+  const yoga = format === "yoga";
   const daysUsed = week.days.length;
   const todayWeekday = weekdayIndex(now);
   const today = week.days.find((d) => d.weekday === todayWeekday);
@@ -40,13 +43,14 @@ export default async function DashboardPage() {
 
   // The big illustrated panel at the top.
   let hero: HeroProps;
-  if (daysUsed === 0) hero = { kind: "empty" };
+  if (daysUsed === 0) hero = { kind: "empty", format };
   else if (today) {
     const done = today.items.filter((i) => i.done).length;
     hero = {
       kind: "workout",
+      format,
       weekday: WEEKDAYS[todayWeekday],
-      focus: groupTitle(scheduleGroupsForDay(today.items)),
+      focus: dayFocus(scheduleGroupsForDay(today.items), format),
       exerciseCount: today.items.length,
       minutes: today.items.reduce((s, i) => s + i.exercise.durationMin, 0) + ROUTINE_MINUTES,
       doneCount: done,
@@ -55,6 +59,7 @@ export default async function DashboardPage() {
   } else {
     hero = {
       kind: "rest",
+      format,
       weekday: WEEKDAYS[todayWeekday],
       next: next ? `Your next workout is on ${WEEKDAYS[next.weekday]}.` : "Your next workout is next week.",
     };
@@ -69,7 +74,7 @@ export default async function DashboardPage() {
     const rated = today.feeling !== undefined;
     steps = [
       { icon: "bolt", title: "Warm up", hint: "3 easy minutes to get moving", status: done > 0 ? "done" : "current" },
-      { icon: "dumbbell", title: "Do your exercises", hint: `${done} of ${total} done. Tap Start workout.`, status: allDone ? "done" : done > 0 ? "current" : "todo" },
+      { icon: "dumbbell", title: yoga ? "Do your poses" : "Do your exercises", hint: `${done} of ${total} done. Tap ${yoga ? "Start session" : "Start workout"}.`, status: allDone ? "done" : done > 0 ? "current" : "todo" },
       { icon: "smile", title: "Rate how it felt", hint: "This shapes next week", status: allDone ? (rated ? "done" : "current") : "todo" },
       { icon: "moon", title: "Rest and recover", hint: "Drink water and sleep well", status: allDone && rated ? "current" : "todo" },
     ];
@@ -80,7 +85,7 @@ export default async function DashboardPage() {
       {
         icon: "calendar",
         title: next ? `Next: ${WEEKDAYS[next.weekday]}` : "Next: next week",
-        hint: next ? groupTitle(scheduleGroupsForDay(next.items)) : "Your new plan arrives on Monday",
+        hint: next ? groupTitle(scheduleGroupsForDay(next.items), format) : "Your new plan arrives on Monday",
         status: "todo",
       },
     ];
@@ -94,7 +99,7 @@ export default async function DashboardPage() {
       workout: d
         ? {
             slot: d.slot,
-            focus: groupTitle(scheduleGroupsForDay(d.items)),
+            focus: groupTitle(scheduleGroupsForDay(d.items), format),
             done: d.items.filter((i) => i.done).length,
             total: d.items.length,
             missed: missed.includes(d),
@@ -114,7 +119,7 @@ export default async function DashboardPage() {
       {today && (
         <section aria-labelledby="today-exercises">
           <h2 id="today-exercises" className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-            Today&apos;s exercises
+            Today&apos;s {itemWord(format)}
           </h2>
           <ul className="mt-5 space-y-4">
             {today.items.map((item) => (

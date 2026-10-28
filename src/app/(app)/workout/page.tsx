@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { WEEKDAYS, weekdayIndex } from "@/lib/dates";
-import { describeTarget, groupTitle } from "@/lib/labels";
+import { formatOf } from "@/lib/formats";
+import { dayFocus, describeTarget } from "@/lib/labels";
 import { getCurrentWeek } from "@/lib/planStore";
 import { getProfile } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
@@ -62,7 +63,7 @@ export default async function WorkoutPage({ searchParams }: { searchParams: Prom
       items={items}
       restSecs={restSeconds(profile.level)}
       daySlot={chosen.slot}
-      title={`${WEEKDAYS[chosen.weekday]}: ${groupTitle(scheduleGroupsForDay(chosen.items))}`}
+      title={`${WEEKDAYS[chosen.weekday]}: ${dayFocus(scheduleGroupsForDay(chosen.items), formatOf(profile))}`}
       warmup={warmupFor(profile)}
       cooldown={cooldownFor(profile)}
       units={profile.units}

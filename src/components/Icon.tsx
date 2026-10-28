@@ -140,7 +140,8 @@ export default function Icon({ name, className = "h-6 w-6", strokeWidth = 2 }: {
 }
 
 /** Icon for a muscle group, used on exercise cards. */
-export function groupIcon(group: string): IconName {
+export function groupIcon(group: string, yoga = false): IconName {
+  if (yoga) return "heart";
   if (group === "cardio") return "pulse";
   if (group === "core") return "target";
   return "dumbbell";

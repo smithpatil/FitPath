@@ -9,6 +9,7 @@ export default function DayHeader({
   minutes,
   limit,
   exerciseCount,
+  noun = "exercises",
   missed,
   startHref,
   note,
@@ -21,6 +22,8 @@ export default function DayHeader({
   /** The user's minutes limit for a workout day. */
   limit: number;
   exerciseCount: number;
+  /** "exercises", or "poses" in yoga. */
+  noun?: string;
   missed: boolean;
   /** Link to workout mode, or null when everything is done. */
   startHref: string | null;
@@ -40,7 +43,7 @@ export default function DayHeader({
           <p className="mt-1 text-3xl font-extrabold leading-tight tracking-tight">{focus}</p>
           <ul className="mt-4 flex flex-wrap gap-2 text-base font-semibold">
             <li className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 ring-1 ring-white/20">
-              <Icon name="dumbbell" className="h-4 w-4 text-spark" /> {exerciseCount} exercises
+              <Icon name="dumbbell" className="h-4 w-4 text-spark" /> {exerciseCount} {noun}
             </li>
             <li className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 ring-1 ring-white/20">
               <Icon name="clock" className="h-4 w-4 text-spark" /> about {minutes} min <span className="font-normal text-ice">of {limit}</span>
@@ -50,7 +53,7 @@ export default function DayHeader({
         </div>
         {startHref && (
           <ButtonLink href={startHref} variant="spark" arrow>
-            Start workout
+            {noun === "poses" ? "Start session" : "Start workout"}
           </ButtonLink>
         )}
       </div>

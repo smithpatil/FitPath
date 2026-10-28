@@ -1,5 +1,5 @@
 import { toggleDone } from "@/app/(app)/actions";
-import { describeTarget, EQUIPMENT_LABEL, GROUP_LABEL } from "@/lib/labels";
+import { describeTarget, EQUIPMENT_LABEL, groupLabel } from "@/lib/labels";
 import type { WeekItem } from "@/lib/planStore";
 import { describeResult, isWeighted, suggestionFor } from "@/lib/strength";
 import { fromKg, type Unit } from "@/lib/units";
@@ -26,7 +26,7 @@ export default function ExerciseCard({ item, units, compact }: { item: WeekItem;
             item.done ? "bg-accent text-white" : "bg-gradient-to-br from-accent to-deep text-white"
           }`}
         >
-          <Icon name={item.done ? "check" : groupIcon(ex.muscleGroup)} className="h-7 w-7" strokeWidth={item.done ? 3 : 2} />
+          <Icon name={item.done ? "check" : groupIcon(ex.muscleGroup, ex.style === "yoga")} className="h-7 w-7" strokeWidth={item.done ? 3 : 2} />
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-2">
@@ -37,7 +37,7 @@ export default function ExerciseCard({ item, units, compact }: { item: WeekItem;
             {describeTarget(item.sets, item.reps, ex.unit)}
           </p>
           <ul className="mt-3 flex flex-wrap gap-2 text-sm font-semibold">
-            {[GROUP_LABEL[ex.muscleGroup], EQUIPMENT_LABEL[ex.equipment[0]], `about ${ex.durationMin} min`].map((t) => (
+            {[groupLabel(ex.muscleGroup, ex.style === "yoga" ? "yoga" : undefined), ex.style === "yoga" ? "Mat" : EQUIPMENT_LABEL[ex.equipment[0]], `about ${ex.durationMin} min`].map((t) => (
               <li key={t} className="rounded-full bg-gray-100 px-3 py-1 text-gray-700">
                 {t}
               </li>

@@ -6,7 +6,7 @@ import DayHeader from "@/components/plan/DayHeader";
 import RescheduleCard from "@/components/RescheduleCard";
 import { WEEKDAYS, weekdayIndex } from "@/lib/dates";
 import { getToday } from "@/lib/today.server";
-import { groupTitle } from "@/lib/labels";
+import { dayFocus, itemWord } from "@/lib/labels";
 import { ROUTINE_MINUTES, exerciseMinutes, usableFor } from "@/lib/planGenerator";
 import { cooldownFor, totalSeconds, warmupFor } from "@/lib/routine";
 import type { RoutineMove } from "@/data/warmups";
@@ -35,7 +35,7 @@ export default async function PlanPage() {
 
   return (
     <div className="space-y-10">
-      <PageHeader icon="list" eyebrow={`Week ${week.weekIndex + 1}`} title="Your weekly plan">
+      <PageHeader icon="list" eyebrow={`Week ${week.weekIndex + 1} · ${FORMAT_INFO[formatOf(profile)].title}`} title="Your weekly plan">
         Each week the numbers go up a little. After a workout, tell us how it felt and next week adapts.
       </PageHeader>
 
@@ -43,11 +43,19 @@ export default async function PlanPage() {
         <h2 id="words" className="flex items-center gap-2 text-xl font-extrabold text-accent-dark">
           <Icon name="smile" className="h-6 w-6" /> Quick word guide
         </h2>
-        <ul className="mt-3 grid gap-3 text-base sm:grid-cols-3">
-          <li className="rounded-2xl bg-white p-4 shadow-card"><strong>Rep</strong><br />Doing the movement once.</li>
-          <li className="rounded-2xl bg-white p-4 shadow-card"><strong>Set</strong><br />A group of reps. &quot;2 sets of 8&quot; = 8 reps, rest, 8 more.</li>
-          <li className="rounded-2xl bg-white p-4 shadow-card"><strong>Seconds</strong><br />Hold a position instead of counting reps.</li>
-        </ul>
+        {formatOf(profile) === "yoga" ? (
+          <ul className="mt-3 grid gap-3 text-base sm:grid-cols-3">
+            <li className="rounded-2xl bg-white p-4 shadow-card"><strong>Hold</strong><br />Stay in the pose and breathe slowly for the time shown.</li>
+            <li className="rounded-2xl bg-white p-4 shadow-card"><strong>Breathe</strong><br />In through your nose, out a little longer. Never hold your breath.</li>
+            <li className="rounded-2xl bg-white p-4 shadow-card"><strong>Both sides</strong><br />If a pose has a left and a right, do each side for the time shown.</li>
+          </ul>
+        ) : (
+          <ul className="mt-3 grid gap-3 text-base sm:grid-cols-3">
+            <li className="rounded-2xl bg-white p-4 shadow-card"><strong>Rep</strong><br />Doing the movement once.</li>
+            <li className="rounded-2xl bg-white p-4 shadow-card"><strong>Set</strong><br />A group of reps. &quot;2 sets of 8&quot; = 8 reps, rest, 8 more.</li>
+            <li className="rounded-2xl bg-white p-4 shadow-card"><strong>Seconds</strong><br />Hold a position instead of counting reps.</li>
+          </ul>
+        )}
         <p className="mt-3 text-base">Move slowly, breathe normally, and stop if anything hurts.</p>
       </section>
 
@@ -61,7 +69,8 @@ export default async function PlanPage() {
             <DayHeader
               id={`day-${d.slot}`}
               weekday={WEEKDAYS[d.weekday]}
-              focus={groupTitle(scheduleGroupsForDay(d.items))}
+              focus={dayFocus(scheduleGroupsForDay(d.items), formatOf(profile))}
+              noun={itemWord(formatOf(profile))}
               minutes={d.items.reduce((s, i) => s + i.exercise.durationMin, 0) + ROUTINE_MINUTES}
               limit={profile.minutes}
               exerciseCount={d.items.length}
